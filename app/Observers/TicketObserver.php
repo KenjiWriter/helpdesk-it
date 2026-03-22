@@ -19,6 +19,11 @@ class TicketObserver
      */
     public function created(Ticket $ticket): void
     {
+        $ticket->histories()->create([
+            'user_id' => $ticket->user_id,
+            'description' => __('Zgłoszenie utworzone'),
+        ]);
+
         $ticket->loadMissing('user');
 
         $itStaff = User::where('role', UserRole::ItStaff->value)->get();

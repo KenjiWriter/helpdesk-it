@@ -76,6 +76,11 @@ class Ticket extends Model
         return $this->hasMany(TicketAttachment::class);
     }
 
+    public function histories(): HasMany
+    {
+        return $this->hasMany(TicketHistory::class);
+    }
+
     // ─── Scopes ──────────────────────────────────────────────────────────────
 
     /** Filter to non-terminal tickets (not Resolved or Closed). */

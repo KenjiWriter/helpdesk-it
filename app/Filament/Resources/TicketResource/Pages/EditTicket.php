@@ -51,12 +51,22 @@ class EditTicket extends EditRecord
                     }
 
                     $record->update($updateData);
-                    
+
+                    $record->histories()->create([
+                        'user_id' => auth()->id(),
+                        'description' => __('Status zmieniony na: :status', ['status' => $status->getLabel()]),
+                    ]);
+
                     if (!empty($data['message'])) {
                         \App\Models\TicketMessage::create([
                             'ticket_id' => $record->id,
                             'user_id' => auth()->id(),
                             'body' => $data['message'],
+                        ]);
+
+                        $record->histories()->create([
+                            'user_id' => auth()->id(),
+                            'description' => __('Dodano nową wiadomość'),
                         ]);
                     }
                     \Filament\Notifications\Notification::make()->success()->title(__('Status zaktualizowany'))->send();
@@ -70,6 +80,10 @@ class EditTicket extends EditRecord
                 ->hidden(fn (Ticket $record) => $record->assignee_id === auth()->id())
                 ->action(function (Ticket $record) {
                     $record->update(['assignee_id' => auth()->id()]);
+                    $record->histories()->create([
+                        'user_id' => auth()->id(),
+                        'description' => __('Przypisano do: :user', ['user' => auth()->user()->name]),
+                    ]);
                     Notification::make()
                         ->title(__('Ticket assigned to you.'))
                         ->success()
@@ -85,6 +99,11 @@ class EditTicket extends EditRecord
         // Auto-assign if not assigned currently
         if (empty($data['assignee_id']) && $this->record->assignee_id === null) {
             $data['assignee_id'] = auth()->id();
+            
+            $this->record->histories()->create([
+                'user_id' => auth()->id(),
+                'description' => __('Automatycznie przypisano do: :user', ['user' => auth()->user()->name]),
+            ]);
         }
 
         // Auto-set resolved_at when status transitions to Resolved (only if submitted in form data)

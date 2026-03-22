@@ -59,6 +59,7 @@ database/migrations/
   notifications_and_observers.md ← Documentation on email notification triggers and Eloquent Observers
   ui_and_branding.md           ← Reganta brand colors, Tailwind config, and Filament branding settings
   dashboard_reports_and_i18n.md ← Translation strategy and advanced reporting metrics for the dashboard
+  audit_trail_pattern.md        ← Audit trail (history log) patterns and implementation rules
 ```
 
 ---
@@ -80,6 +81,7 @@ database/migrations/
 | Changing locale strings or user policy access rules | `.antigravity/skills/i18n_and_user_management.md` |
 | Modifying UI colors, branding, and loaders | `.antigravity/skills/ui_and_branding.md` |
 | Handling translation keys or reporting calculations | `.antigravity/skills/dashboard_reports_and_i18n.md` |
+| Working with History Logs / Audit Trails | `.antigravity/skills/audit_trail_pattern.md` |
 
 ---
 

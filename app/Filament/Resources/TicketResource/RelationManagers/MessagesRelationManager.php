@@ -65,8 +65,15 @@ class MessagesRelationManager extends RelationManager
                     ->label(__('New Message'))
                     ->after(function (RelationManager $livewire) {
                         $ticket = $livewire->getOwnerRecord();
-                        if ($ticket instanceof Ticket && $ticket->assignee_id === null) {
-                            $ticket->update(['assignee_id' => auth()->id()]);
+                        if ($ticket instanceof Ticket) {
+                            $ticket->histories()->create([
+                                'user_id' => auth()->id(),
+                                'description' => __('Dodano nową wiadomość'),
+                            ]);
+
+                            if ($ticket->assignee_id === null) {
+                                $ticket->update(['assignee_id' => auth()->id()]);
+                            }
                         }
                     }),
             ])

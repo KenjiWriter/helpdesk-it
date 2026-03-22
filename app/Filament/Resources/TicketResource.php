@@ -31,6 +31,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use App\Filament\Resources\TicketResource\RelationManagers\MessagesRelationManager;
+use App\Filament\Resources\TicketResource\RelationManagers\TicketHistoriesRelationManager;
 
 class TicketResource extends Resource
 {
@@ -221,6 +222,7 @@ class TicketResource extends Resource
     {
         return [
             MessagesRelationManager::class,
+            TicketHistoriesRelationManager::class,
         ];
     }
 
