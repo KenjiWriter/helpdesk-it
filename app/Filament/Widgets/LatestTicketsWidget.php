@@ -54,7 +54,7 @@ class LatestTicketsWidget extends BaseWidget
                 Action::make('view')
                     ->label('Zobacz zgłoszenie')
                     ->icon('heroicon-o-eye')
-                    ->url(fn (Ticket $record): string => TicketResource::getUrl('view', ['record' => $record]))
+                    ->url(fn (Ticket $record): string => TicketResource::getUrl('edit', ['record' => $record]))
                     ->openUrlInNewTab(false),
             ])
             ->paginated(false);

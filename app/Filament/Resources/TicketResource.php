@@ -97,11 +97,6 @@ class TicketResource extends Resource
                         ->options(TicketCategory::class)
                         ->required(),
 
-                    Select::make('status')
-                        ->label(__('Status'))
-                        ->options(TicketStatus::class)
-                        ->required(),
-
                     Select::make('assignee_id')
                         ->label(__('Przypisano do'))
                         ->relationship(
@@ -211,7 +206,7 @@ class TicketResource extends Resource
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
-                EditAction::make(),
+                EditAction::make()->label(__('Podgląd'))->icon('heroicon-o-eye'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
