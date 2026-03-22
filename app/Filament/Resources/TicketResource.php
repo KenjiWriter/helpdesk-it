@@ -16,6 +16,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Placeholder;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
@@ -27,6 +30,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Filament\Resources\TicketResource\RelationManagers\MessagesRelationManager;
 
 class TicketResource extends Resource
 {
@@ -56,41 +60,40 @@ class TicketResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-
-            Section::make(__('Request Details'))
-                ->description(__('Original ticket information submitted by the user. Read-only.'))
-                ->columns(2)
+            Section::make(__('Szczegóły zgłoszenia'))
                 ->schema([
-                    TextInput::make('user.name')
-                        ->label(__('Submitted By'))
+                    TextInput::make('department.name')
+                        ->label(__('Dział'))
                         ->disabled(),
 
-                    TextInput::make('department.name')
-                        ->label(__('Department'))
+                    TextInput::make('hardware_name')
+                        ->label(__('Sprzęt/Zasób'))
                         ->disabled(),
 
                     Textarea::make('description')
-                        ->label(__('Description'))
+                        ->label(__('Opis'))
                         ->disabled()
                         ->rows(5)
                         ->columnSpanFull(),
+                ])->columns(['default' => 2]),
 
-                    TextInput::make('hardware_name')
-                        ->label(__('Hardware / Asset'))
-                        ->disabled(),
+            Section::make(__('Informacje o zgłaszającym'))
+                ->schema([
+                    Placeholder::make('submitter')
+                        ->hiddenLabel()
+                        ->content(fn ($record) => $record?->user?->name ?? '—')
+                        ->tooltip(fn ($record) => $record?->user ? "Email: {$record->user->email} | Tel: {$record->user->phone}" : null),
                 ]),
 
-            Section::make(__('IT Management'))
-                ->description(__('Fields IT staff can update.'))
-                ->columns(2)
+            Section::make(__('Zarządzanie IT'))
                 ->schema([
                     Select::make('priority')
-                        ->label(__('Priority'))
+                        ->label(__('Priorytet'))
                         ->options(TicketPriority::class)
                         ->required(),
 
                     Select::make('category')
-                        ->label(__('Category'))
+                        ->label(__('Kategoria'))
                         ->options(TicketCategory::class)
                         ->required(),
 
@@ -100,7 +103,7 @@ class TicketResource extends Resource
                         ->required(),
 
                     Select::make('assignee_id')
-                        ->label(__('Assigned To'))
+                        ->label(__('Przypisano do'))
                         ->relationship(
                             name: 'assignee',
                             titleAttribute: 'name',
@@ -111,29 +114,26 @@ class TicketResource extends Resource
                         ->nullable(),
 
                     DateTimePicker::make('resolved_at')
-                        ->label(__('Resolved At'))
+                        ->label(__('Czas rozwiązania'))
                         ->nullable(),
                 ]),
 
-            Section::make(__('User Ratings'))
-                ->description(__('Submitted by the user after ticket resolution.'))
-                ->columns(2)
+            Section::make(__('Oceny użytkownika'))
                 ->schema([
                     TextInput::make('rating_time')
-                        ->label(__('Time Rating (1–6)'))
+                        ->label(__('Ocena czasu (1–6)'))
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(6)
                         ->disabled(),
 
                     TextInput::make('rating_quality')
-                        ->label(__('Quality Rating (1–6)'))
+                        ->label(__('Ocena jakości (1–6)'))
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(6)
                         ->disabled(),
                 ]),
-
         ]);
     }
 
@@ -142,6 +142,7 @@ class TicketResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordAction(\Filament\Tables\Actions\EditAction::class)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')
@@ -211,13 +212,21 @@ class TicketResource extends Resource
             ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
                 EditAction::make(),
-                ViewAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    // ─── Relations ───────────────────────────────────────────────────────────
+
+    public static function getRelations(): array
+    {
+        return [
+            MessagesRelationManager::class,
+        ];
     }
 
     // ─── Pages ───────────────────────────────────────────────────────────────
@@ -228,7 +237,6 @@ class TicketResource extends Resource
             'index'  => Pages\ListTickets::route('/'),
             'create' => Pages\CreateTicket::route('/create'),
             'edit'   => Pages\EditTicket::route('/{record}/edit'),
-            'view'   => Pages\ViewTicket::route('/{record}'),
         ];
     }
 }

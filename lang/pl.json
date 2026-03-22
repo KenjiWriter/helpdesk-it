@@ -51,5 +51,21 @@
     
     "Dashboard": "Panel główny",
     "IT Performance": "Wydajność IT",
-    "Latest Tickets": "Najnowsze zgłoszenia"
+    "Latest Tickets": "Najnowsze zgłoszenia",
+
+    "Messages": "Wiadomości",
+    "Message": "Wiadomość",
+    "Author": "Autor",
+    "Posted At": "Opublikowano",
+    "New Message": "Nowa wiadomość",
+    "Assign to me": "Przypisz do mnie",
+    "Resolve Ticket": "Rozwiąż zgłoszenie",
+    "Resolution Note": "Notatka z rozwiązania",
+    "Attachment": "Załącznik",
+    "Ticket assigned to you.": "Zgłoszenie przypisane do ciebie.",
+    "Ticket Resolved": "Zgłoszenie rozwiązane",
+
+    "Submitter Information": "Informacje o zgłaszającym",
+    "Submitter": "Zgłaszający",
+    "Phone": "Telefon"
 }

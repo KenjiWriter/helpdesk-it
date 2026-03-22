@@ -128,3 +128,26 @@ After generation, always:
 3. Change `$form->schema([...])` → `$schema->components([...])`
 4. Move `Section`, `Grid`, `Tabs` imports to `Filament\Schemas\Components\*`
 5. Verify all overridden property types match the table above
+
+---
+
+## Relation Managers
+
+Create relation managers using:
+```bash
+php artisan make:filament-relation-manager ResourceName relationshipName titleColumn
+```
+
+1. Remember to update the generated class's imports similarly to regular Resources (e.g., `Form` -> `Schema`).
+2. When managing child records where a related property logic applies (such as assigning ticket owners automatically), you can use lifecycle hooks inside table actions (`after(function ($livewire) {...})`) or `mutateFormDataBeforeCreate`.
+3. Use `Hidden::make('field')->default(...)` for auto-set relations without exposing UI.
+4. Ensure related lists are ordered correctly using `defaultSort()`.
+
+---
+
+## Edit Page Quick Actions
+
+Add custom workflow buttons by returning `Filament\Actions\Action` instances in the `getHeaderActions()` method on Edit pages.
+- Complex actions can have their own forms via `->form([...])`.
+- In the `->action(function (array $data, Model $record) {...})` closure, you can safely update the model, spawn related models (using relations like `$record->messages()->create(...)`), manage uploads, and send a `Notification::make()->success()->send()`.
+

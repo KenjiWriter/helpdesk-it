@@ -22,6 +22,11 @@ class UserForm
                     ->email()
                     ->required()
                     ->maxLength(255),
+                TextInput::make('phone')
+                    ->label(__('Phone'))
+                    ->tel()
+                    ->maxLength(255)
+                    ->nullable(),
                 TextInput::make('password')
                     ->label(__('Password'))
                     ->password()
