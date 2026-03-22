@@ -55,6 +55,7 @@ database/migrations/
   filament_conventions.md      ← Filament API rules, property types, install steps
   livewire_flux_frontend.md    ← User frontend: routes, components, file uploads, Flux UI
   messaging_and_ratings.md     ← Documentation on the user ticket messaging thread and rating system
+  authorization_and_widgets.md ← Ticket authorization policies and Filament widget structure
 ```
 
 ---
@@ -71,6 +72,7 @@ database/migrations/
 | Adding Filament form fields, table columns, or filters | `.antigravity/skills/filament_conventions.md` |
 | Creating/editing Livewire user pages or file uploads | `.antigravity/skills/livewire_flux_frontend.md` |
 | Modifying sidebar nav or Flux UI components | `.antigravity/skills/livewire_flux_frontend.md` |
+| Working with Ticket Policies or Filament Widgets | `.antigravity/skills/authorization_and_widgets.md` |
 
 ---
 
@@ -91,7 +93,4 @@ The Filament IT panel is available at: `http://localhost:8000/helpdesk`
 
 ## What Is NOT Built Yet
 
-- Ticket messaging thread UI
-- Dashboard stats/widgets in Filament
 - Email notifications
-- Laravel Policy for `Ticket` (ownership is currently checked manually in `Show::mount()`)

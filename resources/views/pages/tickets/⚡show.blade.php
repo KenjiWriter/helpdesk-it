@@ -22,9 +22,7 @@ new #[Title('Ticket Details')] class extends Component {
 
     public function mount(Ticket $ticket): void
     {
-        if ($ticket->user_id !== auth()->id()) {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('view', $ticket);
 
         $this->ticket = $ticket->load(['department', 'attachments', 'assignee', 'messages.user']);
     }
