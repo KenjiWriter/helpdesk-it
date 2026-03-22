@@ -1,70 +1,96 @@
-# IT Helpdesk
+# 🏗️ REGANTA IT Helpdesk
 
-A comprehensive IT Helpdesk ticketing system built with Laravel 12, Livewire 4 (Volt), Flux UI, and Filament PHP 5.
+[![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![Filament 5](https://img.shields.io/badge/Filament-5.x-F37021?style=for-the-badge&logo=filament)](https://filamentphp.com)
+[![Livewire 4](https://img.shields.io/badge/Livewire-4.x-4e56a6?style=for-the-badge&logo=livewire)](https://livewire.laravel.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
 
-## Key Features
+An enterprise-grade, custom-built IT Helpdesk ecosystem designed specifically for **REGANTA**. This system provides a seamless, high-performance bridge between employees and the IT support department, featuring a state-of-the-art dual-interface architecture.
 
-- **Role-Based Access Control**: Strict separation between Users (Frontend Dashboard) and IT Staff/Admins (Filament Panel). 
-- **Custom Post-Login Redirection**: Admins and IT Staff are intelligently routed to their administrative panel (`/helpdesk`), while regular users land on the standard Dashboard (`/dashboard`).
-- **Ticketing & Messaging**: Full support for creating, assigning, status tracking, and chronological threaded messaging on tickets. Includes a terminal-state auto-lock mechanism upon ticket resolution.
-- **Service Rating**: Integrated dynamic rating system for solved tickets allowing users to explicitly rate response time and service quality. This action auto-closes the ticket on submission.
-- **File Uploads**: Native ticket attachment support utilizing temporary uploaded files seamlessly integrated with the public disk storage route.
-- **Event-Driven Notifications**: Asynchronous email delivery utilizing Eloquent Observers tied strictly to `Ticket` and `TicketMessage` model events (e.g., ticket creation, status updates, new replies).
-- **Internationalization (i18n)**: Out-of-the-box Polish (`pl`) default localization with English fallback support.
-- **Dynamic Stats Dashboard**: Real-time Filament widgets tracking Open, Resolved Today, and Urgent/Fire priority tickets.
-- **Strict User Management**: Admin-only access to manage user accounts with built-in forced password reset functionalities dynamically hashed into the database.
+---
 
-## Architecture & Tech Stack
+## 🚀 Project Overview
 
-- **Framework**: Laravel 12
-- **Frontend**: Livewire 4 (Volt functional API) & Flux UI elements (e.g. `<flux:callout>`, `<flux:textarea>`)
-- **Admin Panel**: Filament v5.4.1 
-- **Database**: SQLite (or any supported Laravel PDO)
-- **Local Settings**: Requires `QUEUE_CONNECTION=sync` & `MAIL_MAILER=log` for local notification testing.
+The REGANTA IT Helpdesk is more than just a ticketing tool; it's a comprehensive service management platform. It leverages the latest PHP 8.3 and Laravel 12 features to provide a robust, scalable, and highly interactive experience for both support seekers and IT technicians.
 
-## System Roles & Permissions
+---
 
-Implemented via `UserRole` enum and `TicketPolicy` / `UserPolicy`:
+## ✨ Key Features
 
-- **User (`user`)**: Can create tickets, view assigned dashboard, and reply to open tickets they own.
-- **IT Staff (`it_staff`)**: Can access the `/helpdesk` Filament panel to explicitly manage, resolve, and reply to tickets. Receives staff-focused notifications.
-- **Admin (`admin`)**: Inherits all IT Staff abilities, plus full User Management (create users, reset passwords).
+### 🖥️ Dual-Interface Architecture
+- **Employee Portal**: A modern, high-speed frontend built with **Livewire 4**, **Volt**, and **Flux UI**. Employees can submit tickets, attach evidence, and chat in real-time with technicians.
+- **IT Control Center**: A customized **Filament 5.4.1** administration panel for IT Staff and Admins. It features advanced resource management, filtering, and real-time activity streams.
 
-## Setup & Installation
+### 🔄 Interactive Status Pipeline
+Tickets follow a strict, logical lifecycle to ensure no request is lost:
+`New` ➡️ `In Progress` ➡️ `Waiting on User` ➡️ `Suspended` ➡️ `Resolved` ➡️ `Closed`.
 
-1. Clone the repository and install dependencies:
+### 📜 Tamper-Proof Audit Trail
+Every action (status change, assignment, new message) is automatically logged into a read-only **Ticket History** log via Eloquent Observers. This ensures a 100% reliable audit trail for compliance and quality assurance.
+
+### 📊 Advanced Reporting & Analytics
+- **IT Performance Tracking**: Real-time metrics on resolution times and staff workload.
+- **Resolution SLAs**: Calculation of average resolution times across all tickets, formatted for executive review.
+- **Visual Dashboards**: Interactive widgets showing "Resolved Today", "Urgent/Fire" tickets, and latest system activity.
+
+### 🎨 REGANTA Corporate Branding
+The entire UI is tailored to REGANTA's corporate identity, utilizing the signature **Reganta Orange (#F37021)** and high-quality typography.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Core**: Laravel 12.x / PHP 8.3+
+- **Frontend (Users)**: Livewire 4, Volt (Functional Components), Flux UI
+- **Backend (IT Staff)**: Filament 5.4.1 (Latest)
+- **Styling**: Tailwind CSS 4.x
+- **Database**: SQLite (Development) / PostgreSQL (Production ready)
+- **Security**: Laravel Fortify with Two-Factor Authentication (2FA) support
+
+---
+
+## ⚙️ Setup & Installation
+
+Follow these steps to get the REGANTA Helpdesk running locally:
+
+1. **Clone & Install**:
    ```bash
+   git clone <repository-url>
    composer install
    npm install && npm run build
    ```
-2. Set up environment variables locally:
+
+2. **Environment Configuration**:
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
-3. Prepare storage links for attachments:
-   ```bash
-   php artisan storage:link
-   ```
-4. Run migrations and seeders:
-   ```bash
-   php artisan migrate --seed
-   ```
-5. Start the application:
-   ```bash
-   php artisan serve
-   composer run dev
-   ```
 
-## Application Access Points
-- **Standard User Dashboard**: [http://localhost:8000/dashboard](http://localhost:8000/dashboard)
-- **IT/Admin Panel**: [http://localhost:8000/helpdesk](http://localhost:8000/helpdesk)
-
-## Automated Testing
-
-Maintain quality logic via the PHPUnit / Pest testing infrastructure:
-- **Notifications**: `php artisan test --filter=NotificationsTest` 
-- **Authentication/Redirection**: `php artisan test --filter=AuthenticationTest` and `DashboardTest`
+3. **Initialize Database & Seed Realistic Data**:
+   This project includes a **Time-Traveling Seeder** that generates a realistic historical dataset.
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+   *This command will generate 30 tickets with distributed historical events across the last 30 days, providing a perfect "pre-populated" environment for testing.*
 
 ---
-*For in-depth architectural decisions, consult the markdown references located in the `.antigravity/skills/` directory.*
+
+## 🔐 Test Credentials
+
+| Role | Email | Password | Panel Access |
+| :--- | :--- | :--- | :--- |
+| **System Admin** | `admin@example.com` | `password` | `/helpdesk` |
+| **IT Staff** | `it1@example.com` | `password` | `/helpdesk` |
+| **Regular User** | `user1@example.com` | `password` | `/dashboard` |
+
+---
+
+## 🏛️ Architectural Decisions
+
+- **Custom Relation Managers**: Used for Ticket History and Messaging threads to keep the UI clean and contextual.
+- **Single-Column Form Layouts**: Filament forms are optimized into single-column sections for maximum clarity and mobile-friendliness for technicians in the field.
+- **Decoupled Business Logic**: Status updates and notifications are handled via **Eloquent Observers** (`TicketObserver`, `TicketMessageObserver`), keeping controllers and components thin.
+- **Flux Component Synergy**: Use of the Flux UI library ensures a premium, high-interaction frontend consistent with modern web standards.
+
+---
+*Developed with excellence for REGANTA.*

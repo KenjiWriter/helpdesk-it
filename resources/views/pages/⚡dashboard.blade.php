@@ -5,7 +5,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Title('My Tickets')] class extends Component {
+new #[Title('Moje zgłoszenia')] class extends Component {
     use WithPagination;
 
     public function with(): array
@@ -40,26 +40,26 @@ new #[Title('My Tickets')] class extends Component {
     <!-- Page header -->
     <div class="mb-8 flex items-center justify-between">
         <div>
-            <flux:heading size="xl" level="1">My Tickets</flux:heading>
-            <flux:subheading>Track all the IT support requests you have submitted.</flux:subheading>
+            <flux:heading size="xl" level="1">{{ __('My Tickets') }}</flux:heading>
+            <flux:subheading>{{ __('Track all the IT support requests you have submitted.') }}</flux:subheading>
         </div>
         <flux:button variant="primary" icon="plus" href="{{ route('tickets.create') }}" wire:navigate>
-            New Ticket
+            {{ __('New Ticket') }}
         </flux:button>
     </div>
 
     <!-- Stats row -->
     <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Total submitted</flux:text>
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Total submitted') }}</flux:text>
             <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-white">{{ $totalCount }}</p>
         </div>
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Currently open</flux:text>
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Currently open') }}</flux:text>
             <p class="mt-1 text-3xl font-bold text-blue-600 dark:text-blue-400">{{ $openCount }}</p>
         </div>
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Resolved / Closed</flux:text>
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Resolved / Closed') }}</flux:text>
             <p class="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">{{ $resolvedCount }}</p>
         </div>
     </div>
@@ -68,12 +68,12 @@ new #[Title('My Tickets')] class extends Component {
         <!-- Empty state -->
         <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-20 text-center dark:border-zinc-700 dark:bg-zinc-900">
             <flux:icon.ticket class="mb-4 size-12 text-zinc-400" />
-            <flux:heading size="lg">No tickets yet</flux:heading>
+            <flux:heading size="lg">{{ __('No tickets yet') }}</flux:heading>
             <flux:subheading class="mt-1 max-w-sm">
-                Run into a tech problem? Submit your first support ticket and our IT team will get right on it.
+                {{ __('Run into a tech problem? Submit your first support ticket and our IT team will get right on it.') }}
             </flux:subheading>
             <flux:button variant="primary" icon="plus" class="mt-6" href="{{ route('tickets.create') }}" wire:navigate>
-                Submit a Ticket
+                {{ __('Submit a Ticket') }}
             </flux:button>
         </div>
     @else
@@ -83,11 +83,11 @@ new #[Title('My Tickets')] class extends Component {
                 <thead class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">#</th>
-                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Category</th>
-                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Priority</th>
-                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Status</th>
-                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Department</th>
-                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Submitted</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">{{ __('Category') }}</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">{{ __('Priority') }}</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">{{ __('Status') }}</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">{{ __('Department') }}</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">{{ __('Submitted') }}</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -133,7 +133,7 @@ new #[Title('My Tickets')] class extends Component {
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <flux:button size="sm" variant="ghost" href="{{ route('tickets.show', $ticket) }}" wire:navigate>
-                                    View
+                                    {{ __('View') }}
                                 </flux:button>
                             </td>
                         </tr>
