@@ -54,6 +54,7 @@ database/migrations/
   database_schema.md           ← DB schema, enums, relationships
   filament_conventions.md      ← Filament API rules, property types, install steps
   livewire_flux_frontend.md    ← User frontend: routes, components, file uploads, Flux UI
+  messaging_and_ratings.md     ← Documentation on the user ticket messaging thread and rating system
 ```
 
 ---

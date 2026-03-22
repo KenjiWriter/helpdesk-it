@@ -1,12 +1,24 @@
 <?php
 
 use App\Models\Ticket;
+use App\Models\TicketMessage;
+use App\Enums\TicketStatus;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 new #[Title('Ticket Details')] class extends Component {
     public Ticket $ticket;
+
+    #[Validate('required|string|max:2000')]
+    public string $newMessageBody = '';
+
+    #[Validate('required|integer|between:1,6')]
+    public ?int $ratingTime = null;
+
+    #[Validate('required|integer|between:1,6')]
+    public ?int $ratingQuality = null;
 
     public function mount(Ticket $ticket): void
     {
@@ -14,7 +26,53 @@ new #[Title('Ticket Details')] class extends Component {
             abort(403);
         }
 
-        $this->ticket = $ticket->load(['department', 'attachments', 'assignee']);
+        $this->ticket = $ticket->load(['department', 'attachments', 'assignee', 'messages.user']);
+    }
+
+    public function addMessage(): void
+    {
+        $this->ticket->refresh();
+
+        if ($this->ticket->status->isTerminal()) {
+            return;
+        }
+
+        $this->validateOnly('newMessageBody');
+
+        TicketMessage::create([
+            'ticket_id' => $this->ticket->id,
+            'user_id' => auth()->id(),
+            'body' => $this->newMessageBody,
+        ]);
+
+        $this->newMessageBody = '';
+        $this->ticket->load('messages.user');
+
+        session()->flash('success', 'Message added successfully.');
+    }
+
+    public function submitRating(): void
+    {
+        $this->ticket->refresh();
+
+        if ($this->ticket->status !== TicketStatus::Resolved) {
+            return;
+        }
+
+        if ($this->ticket->rating_time !== null) {
+            return;
+        }
+
+        $this->validateOnly('ratingTime');
+        $this->validateOnly('ratingQuality');
+
+        $this->ticket->update([
+            'rating_time' => $this->ratingTime,
+            'rating_quality' => $this->ratingQuality,
+            'status' => TicketStatus::Closed, // Auto-close on rating as requested
+        ]);
+
+        session()->flash('success', 'Thank you for your rating. The ticket is now closed.');
     }
 }; ?>
 
@@ -141,5 +199,99 @@ new #[Title('Ticket Details')] class extends Component {
                 </ul>
             </div>
         @endif
+
+        <!-- Messages Thread -->
+        <div class="mt-8 space-y-6">
+            <flux:heading size="lg">Messages</flux:heading>
+
+            @if ($ticket->messages->isEmpty())
+                <flux:text class="text-zinc-500">No messages yet.</flux:text>
+            @else
+                <div class="space-y-4">
+                    @foreach ($ticket->messages as $message)
+                        <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                            <div class="mb-2 flex items-center justify-between">
+                                <flux:text class="font-medium text-zinc-900 dark:text-white">
+                                    {{ $message->user->name }}
+                                    @if ($message->user->role !== \App\Enums\UserRole::User)
+                                        <span class="ml-2 inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">Staff</span>
+                                    @endif
+                                </flux:text>
+                                <flux:text size="sm" class="text-zinc-500">
+                                    {{ $message->created_at->format('M d, H:i') }}
+                                </flux:text>
+                            </div>
+                            <flux:text class="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{{ $message->body }}</flux:text>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        <!-- Forms: Reply or Rating -->
+        <div class="mt-8">
+            @if (! $ticket->status->isTerminal())
+                <!-- Reply Form -->
+                <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
+                    <flux:heading size="sm" class="mb-4">Post a Reply</flux:heading>
+                    <form wire:submit="addMessage" class="space-y-4">
+                        <flux:field>
+                            <flux:textarea wire:model="newMessageBody" rows="4" placeholder="Type your message here..." />
+                            <flux:error name="newMessageBody" />
+                        </flux:field>
+                        <div class="flex justify-end">
+                            <flux:button type="submit" variant="primary">Send Message</flux:button>
+                        </div>
+                    </form>
+                </div>
+            @elseif ($ticket->status === \App\Enums\TicketStatus::Resolved && $ticket->rating_time === null)
+                <!-- Rating Form -->
+                <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
+                    <flux:heading size="sm" class="mb-2">Ticket Resolved - Please Rate Our Service</flux:heading>
+                    <flux:text size="sm" class="mb-6 text-zinc-500">Please provide a rating from 1 (Poor) to 6 (Excellent). Rating this ticket will close it permanently.</flux:text>
+
+                    <form wire:submit="submitRating" class="space-y-6">
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <flux:field>
+                                <flux:label>Response Time</flux:label>
+                                <flux:select wire:model="ratingTime" placeholder="Select rating...">
+                                    <flux:select.option value="1">1 - Very Slow</flux:select.option>
+                                    <flux:select.option value="2">2 - Slow</flux:select.option>
+                                    <flux:select.option value="3">3 - Average</flux:select.option>
+                                    <flux:select.option value="4">4 - Good</flux:select.option>
+                                    <flux:select.option value="5">5 - Fast</flux:select.option>
+                                    <flux:select.option value="6">6 - Very Fast</flux:select.option>
+                                </flux:select>
+                                <flux:error name="ratingTime" />
+                            </flux:field>
+
+                            <flux:field>
+                                <flux:label>Service Quality</flux:label>
+                                <flux:select wire:model="ratingQuality" placeholder="Select rating...">
+                                    <flux:select.option value="1">1 - Very Poor</flux:select.option>
+                                    <flux:select.option value="2">2 - Poor</flux:select.option>
+                                    <flux:select.option value="3">3 - Average</flux:select.option>
+                                    <flux:select.option value="4">4 - Good</flux:select.option>
+                                    <flux:select.option value="5">5 - Excellent</flux:select.option>
+                                    <flux:select.option value="6">6 - Outstanding</flux:select.option>
+                                </flux:select>
+                                <flux:error name="ratingQuality" />
+                            </flux:field>
+                        </div>
+                        <div class="flex justify-end">
+                            <flux:button type="submit" variant="primary">Submit Rating</flux:button>
+                        </div>
+                    </form>
+                </div>
+            @else
+                <!-- Informational Callout for Closed Ticket -->
+                <flux:callout variant="danger" icon="lock-closed">
+                    This ticket is {{ strtolower($ticket->status->getLabel()) }} and cannot receive new replies.
+                    @if($ticket->rating_time)
+                        <span class="mt-1 block">Thank you for rating our service: Response Time ({{ $ticket->rating_time }}/6), Quality ({{ $ticket->rating_quality }}/6).</span>
+                    @endif
+                </flux:callout>
+            @endif
+        </div>
     </div>
 </div>
