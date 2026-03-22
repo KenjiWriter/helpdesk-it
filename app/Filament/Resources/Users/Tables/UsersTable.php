@@ -18,11 +18,13 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label(__('Email'))
                     ->searchable(),
                 TextColumn::make('role')
+                    ->label(__('Role'))
                     ->formatStateUsing(fn ($state) => is_string($state) ? ucfirst($state) : $state->label())
                     ->badge()
                     ->color(fn ($state) => match (is_string($state) ? $state : $state->value) {
@@ -33,6 +35,7 @@ class UsersTable
                     })
                     ->searchable(),
                 TextColumn::make('department.name')
+                    ->label(__('Department'))
                     ->searchable(),
             ])
             ->filters([

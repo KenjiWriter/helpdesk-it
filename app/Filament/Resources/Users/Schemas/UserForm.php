@@ -14,19 +14,22 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label(__('Email'))
                     ->email()
                     ->required()
                     ->maxLength(255),
                 TextInput::make('password')
+                    ->label(__('Password'))
                     ->password()
                     ->required(fn (string $context): bool => $context === 'create')
                     ->dehydrated(fn ($state) => filled($state))
                     ->maxLength(255),
                 Select::make('role')
+                    ->label(__('Role'))
                     ->options([
                         'user' => 'User',
                         'it_staff' => 'IT Staff',
@@ -35,6 +38,7 @@ class UserForm
                     ->default('user')
                     ->required(),
                 Select::make('department_id')
+                    ->label(__('Department'))
                     ->relationship('department', 'name')
                     ->required(),
             ]);

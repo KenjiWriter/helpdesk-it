@@ -18,6 +18,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
@@ -30,9 +34,20 @@ class TicketResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
 
-    protected static ?string $navigationLabel = 'Tickets';
+    public static function getNavigationLabel(): string
+    {
+        return __('Tickets');
+    }
 
-    protected static ?string $modelLabel = 'Ticket';
+    public static function getModelLabel(): string
+    {
+        return __('Ticket');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Tickets');
+    }
 
     protected static ?int $navigationSort = 1;
 
@@ -42,50 +57,50 @@ class TicketResource extends Resource
     {
         return $schema->components([
 
-            Section::make('Request Details')
-                ->description('Original ticket information submitted by the user. Read-only.')
+            Section::make(__('Request Details'))
+                ->description(__('Original ticket information submitted by the user. Read-only.'))
                 ->columns(2)
                 ->schema([
                     TextInput::make('user.name')
-                        ->label('Submitted By')
+                        ->label(__('Submitted By'))
                         ->disabled(),
 
                     TextInput::make('department.name')
-                        ->label('Department')
+                        ->label(__('Department'))
                         ->disabled(),
 
                     Textarea::make('description')
-                        ->label('Description')
+                        ->label(__('Description'))
                         ->disabled()
                         ->rows(5)
                         ->columnSpanFull(),
 
                     TextInput::make('hardware_name')
-                        ->label('Hardware / Asset')
+                        ->label(__('Hardware / Asset'))
                         ->disabled(),
                 ]),
 
-            Section::make('IT Management')
-                ->description('Fields IT staff can update.')
+            Section::make(__('IT Management'))
+                ->description(__('Fields IT staff can update.'))
                 ->columns(2)
                 ->schema([
                     Select::make('priority')
-                        ->label('Priority')
+                        ->label(__('Priority'))
                         ->options(TicketPriority::class)
                         ->required(),
 
                     Select::make('category')
-                        ->label('Category')
+                        ->label(__('Category'))
                         ->options(TicketCategory::class)
                         ->required(),
 
                     Select::make('status')
-                        ->label('Status')
+                        ->label(__('Status'))
                         ->options(TicketStatus::class)
                         ->required(),
 
                     Select::make('assignee_id')
-                        ->label('Assigned To')
+                        ->label(__('Assigned To'))
                         ->relationship(
                             name: 'assignee',
                             titleAttribute: 'name',
@@ -96,23 +111,23 @@ class TicketResource extends Resource
                         ->nullable(),
 
                     DateTimePicker::make('resolved_at')
-                        ->label('Resolved At')
+                        ->label(__('Resolved At'))
                         ->nullable(),
                 ]),
 
-            Section::make('User Ratings')
-                ->description('Submitted by the user after ticket resolution.')
+            Section::make(__('User Ratings'))
+                ->description(__('Submitted by the user after ticket resolution.'))
                 ->columns(2)
                 ->schema([
                     TextInput::make('rating_time')
-                        ->label('Time Rating (1–6)')
+                        ->label(__('Time Rating (1–6)'))
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(6)
                         ->disabled(),
 
                     TextInput::make('rating_quality')
-                        ->label('Quality Rating (1–6)')
+                        ->label(__('Quality Rating (1–6)'))
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(6)
@@ -135,56 +150,56 @@ class TicketResource extends Resource
                     ->width('60px'),
 
                 BadgeColumn::make('priority')
-                    ->label('Priority')
+                    ->label(__('Priority'))
                     ->sortable(),
 
                 BadgeColumn::make('status')
-                    ->label('Status')
+                    ->label(__('Status'))
                     ->sortable(),
 
                 BadgeColumn::make('category')
-                    ->label('Category'),
+                    ->label(__('Category')),
 
                 TextColumn::make('user.name')
-                    ->label('Submitted By')
+                    ->label(__('Submitted By'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('assignee.name')
-                    ->label('Assignee')
-                    ->placeholder('Unassigned')
+                    ->label(__('Assignee'))
+                    ->placeholder(__('Unassigned'))
                     ->searchable()
                     ->toggleable(),
 
                 TextColumn::make('department.name')
-                    ->label('Department')
-                    ->placeholder('—')
+                    ->label(__('Department'))
+                    ->placeholder(__('—'))
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('created_at')
-                    ->label('Opened')
+                    ->label(__('Opened'))
                     ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Status')
+                    ->label(__('Status'))
                     ->options(TicketStatus::class)
                     ->multiple(),
 
                 SelectFilter::make('priority')
-                    ->label('Priority')
+                    ->label(__('Priority'))
                     ->options(TicketPriority::class)
                     ->multiple(),
 
                 SelectFilter::make('category')
-                    ->label('Category')
+                    ->label(__('Category'))
                     ->options(TicketCategory::class)
                     ->multiple(),
 
                 SelectFilter::make('assignee_id')
-                    ->label('Assignee')
+                    ->label(__('Assignee'))
                     ->relationship(
                         name: 'assignee',
                         titleAttribute: 'name',
@@ -195,12 +210,12 @@ class TicketResource extends Resource
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
-                \Filament\Tables\Actions\EditAction::make(),
-                \Filament\Tables\Actions\ViewAction::make(),
+                EditAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
-                \Filament\Tables\Actions\BulkActionGroup::make([
-                    \Filament\Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
