@@ -56,6 +56,7 @@ database/migrations/
   livewire_flux_frontend.md    ← User frontend: routes, components, file uploads, Flux UI
   messaging_and_ratings.md     ← Documentation on the user ticket messaging thread and rating system
   authorization_and_widgets.md ← Ticket authorization policies and Filament widget structure
+  notifications_and_observers.md ← Documentation on email notification triggers and Eloquent Observers
 ```
 
 ---
@@ -73,6 +74,7 @@ database/migrations/
 | Creating/editing Livewire user pages or file uploads | `.antigravity/skills/livewire_flux_frontend.md` |
 | Modifying sidebar nav or Flux UI components | `.antigravity/skills/livewire_flux_frontend.md` |
 | Working with Ticket Policies or Filament Widgets | `.antigravity/skills/authorization_and_widgets.md` |
+| Modifying ticket notifications or observer logic | `.antigravity/skills/notifications_and_observers.md` |
 
 ---
 
@@ -90,7 +92,6 @@ php artisan serve                  # start dev server
 The Filament IT panel is available at: `http://localhost:8000/helpdesk`
 
 ---
-
 ## What Is NOT Built Yet
 
-- Email notifications
+All defined baseline features are complete!

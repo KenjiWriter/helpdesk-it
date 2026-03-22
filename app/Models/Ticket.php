@@ -7,12 +7,16 @@ namespace App\Models;
 use App\Enums\TicketCategory;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
+use App\Observers\TicketObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[ObservedBy(TicketObserver::class)]
 #[Fillable([
     'user_id',
     'department_id',
@@ -28,6 +32,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Ticket extends Model
 {
+    /** @use HasFactory<\Database\Factories\TicketFactory> */
+    use HasFactory;
     /**
      * @return array<string, string>
      */
