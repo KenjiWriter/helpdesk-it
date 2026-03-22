@@ -200,7 +200,7 @@ new #[Title('New Ticket')] class extends Component {
                     </ul>
                 @endif
 
-                <div wire:loading wire:target="attachments" class="mt-2 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                <div wire:loading wire:target="attachments" class="mt-2 flex items-center gap-2 text-sm text-accent dark:text-accent-400">
                     <flux:icon.arrow-path class="size-4 animate-spin" />
                     Uploading files…
                 </div>

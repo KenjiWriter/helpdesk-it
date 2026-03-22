@@ -57,6 +57,7 @@ database/migrations/
   messaging_and_ratings.md     ← Documentation on the user ticket messaging thread and rating system
   authorization_and_widgets.md ← Ticket authorization policies and Filament widget structure
   notifications_and_observers.md ← Documentation on email notification triggers and Eloquent Observers
+  ui_and_branding.md           ← Reganta brand colors, Tailwind config, and Filament branding settings
 ```
 
 ---
@@ -76,6 +77,7 @@ database/migrations/
 | Working with Ticket Policies or Filament Widgets | `.antigravity/skills/authorization_and_widgets.md` |
 | Modifying ticket notifications or observer logic | `.antigravity/skills/notifications_and_observers.md` |
 | Changing locale strings or user policy access rules | `.antigravity/skills/i18n_and_user_management.md` |
+| Modifying UI colors, branding, and loaders | `.antigravity/skills/ui_and_branding.md` |
 
 ---
 

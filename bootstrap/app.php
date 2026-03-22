@@ -14,6 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role.user' => \App\Http\Middleware\EnsureUserRole::class,
         ]);
+
+        $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
+            if ($request->user()?->role?->canAccessPanel()) {
+                return '/helpdesk';
+            }
+
+            return '/dashboard';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
