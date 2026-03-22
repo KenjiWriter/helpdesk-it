@@ -1,9 +1,9 @@
 ---
 name: livewire_flux_frontend
-description: How the user-facing Livewire/Flux frontend is structured, how routes are protected, and how file uploads are handled.
+description: How the user-facing Livewire/Volt frontend is structured, how routes are protected, and how file uploads are handled.
 ---
 
-# Livewire + Flux User Frontend — IT Helpdesk
+# Livewire + Volt User Frontend — IT Helpdesk
 
 > Read this file before creating or modifying any user-facing Livewire pages, routes, file upload logic, or sidebar navigation.
 
@@ -11,13 +11,13 @@ description: How the user-facing Livewire/Flux frontend is structured, how route
 
 ## Architecture Overview
 
-Regular employees (`UserRole::User`) use a **Livewire 4 + Flux** frontend at `/dashboard` and `/tickets/*`. IT staff and admins use the **Filament panel** at `/helpdesk`. These two areas are completely separate.
+Regular employees (`UserRole::User`) use a **Livewire 4 / Volt + Flux** frontend at `/dashboard` and `/tickets/*`. IT staff and admins use the **Filament panel** at `/helpdesk`. These two areas are completely separate.
 
 ---
 
 ## Route Protection
 
-All user-facing routes are wrapped in three middleware layers:
+All user-facing routes use three middleware layers:
 
 ```php
 Route::middleware(['auth', 'verified', 'role.user'])->group(function () {
@@ -31,49 +31,112 @@ Route::middleware(['auth', 'verified', 'role.user'])->group(function () {
 - `verified` — email must be verified.
 - `role.user` — `App\Http\Middleware\EnsureUserRole` — aborts 403 if `$user->role !== UserRole::User`.
 
-**IT staff / admin hitting `/dashboard` get a 403.** They should use `/helpdesk`.
+**IT staff / admin hitting `/dashboard` get a 403.** They use `/helpdesk`.
 
 ---
 
-## Component Naming Convention
+## Volt Component Pattern
 
-| Livewire class | Blade view |
-|----------------|------------|
-| `App\Livewire\Pages\Dashboard` | `resources/views/pages/⚡dashboard.blade.php` |
-| `App\Livewire\Pages\Tickets\Create` | `resources/views/pages/tickets/⚡create.blade.php` |
-| `App\Livewire\Pages\Tickets\Show` | `resources/views/pages/tickets/⚡show.blade.php` |
+This project uses **Volt** (functional style: PHP class inline in the Blade file), matching the existing `⚡settings/*.blade.php` convention.
 
-All components use `#[Layout('components.layouts.app')]` (the Flux sidebar layout) and `#[Title('...')]` attributes.
+### ✅ Correct Volt structure
+
+```blade
+<?php
+
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+new #[Title('Page Title')] class extends Component {
+
+    // Data for the template — use with() NOT render()
+    public function with(): array
+    {
+        return ['items' => Item::all()];
+    }
+
+}; ?>
+
+<div>  {{-- ← single root element, REQUIRED --}}
+    {{-- template here — $items is available --}}
+</div>
+```
+
+### ❌ Wrong — do NOT do this
+
+```blade
+{{-- WRONG: calling render() tries to find a separate .blade.php file --}}
+public function render(): \Illuminate\View\View
+{
+    return $this->view('pages.dashboard', [...]);
+}
+
+{{-- WRONG: Route::livewire() already applies the layout —
+     wrapping in <x-layouts::app> causes MultipleRootElementsDetectedException --}}
+<x-layouts::app>
+    <flux:main> ... </flux:main>
+</x-layouts::app>
+```
+
+### Key rules
+
+| Rule | Detail |
+|------|--------|
+| **Single root element** | Template must start with exactly one `<div>` or other HTML element |
+| **Use `with()`** | Return view data from `with(): array` — do NOT define `render()` |
+| **No layout wrapper** | `Route::livewire()` automatically applies the default layout (`components.layouts.app`); never add `<x-layouts::app>` in the template |
+| **No `<flux:main>`** | Already included by the layout; don't add it again inside the component |
+| **`#[Title]` works** | Volt components support `#[Title('...')]` and other attributes |
+| **Public properties** | All `public` properties are automatically available in the template |
+
+---
+
+## File Lookup Path
+
+`Route::livewire('tickets/create', 'pages::tickets.create')` resolves to:
+
+```
+resources/views/pages/tickets/⚡create.blade.php
+```
+
+The `⚡` prefix marks Volt components. The `pages::` namespace maps to `resources/views/pages/`.
+
+---
+
+## Component Inventory
+
+| Route | Volt file | Purpose |
+|-------|-----------|---------|
+| `/dashboard` | `pages/⚡dashboard.blade.php` | User ticket history + stats |
+| `/tickets/create` | `pages/tickets/⚡create.blade.php` | Ticket submission form |
+| `/tickets/{ticket}` | `pages/tickets/⚡show.blade.php` | Read-only ticket detail |
 
 ---
 
 ## File Upload Pattern
 
-The `Create` component uses Livewire's `WithFileUploads` trait.
+The `⚡create.blade.php` component uses Livewire's `WithFileUploads` trait:
 
 ```php
 use Livewire\WithFileUploads;
 
-class Create extends Component
-{
+new class extends Component {
     use WithFileUploads;
 
     /** @var array<int, TemporaryUploadedFile> */
-    #[Rule(['attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,pdf|max:4096'])]
     public array $attachments = [];
 ```
 
-### Storage
+### Storage flow
 
-Attachments are stored on the **`public` disk** (requires `php artisan storage:link` run once):
+Attachments are stored on the **`public` disk** (requires `php artisan storage:link` once):
 
 ```php
 $path = $file->storePublicly('ticket-attachments', 'public');
-// stored at: storage/app/public/ticket-attachments/<hash>.<ext>
-// public URL: Storage::disk('public')->url($path)
+// URL: Storage::disk('public')->url($path)
 ```
 
-A `TicketAttachment` record is created for each file:
+A `TicketAttachment` record is created per file:
 
 ```php
 TicketAttachment::create([
@@ -86,44 +149,32 @@ TicketAttachment::create([
 ]);
 ```
 
-**Never** store attachments on the `local` disk — they won't be publicly accessible.
-
 ---
 
 ## Sidebar Navigation
 
-Defined in `resources/views/layouts/app/sidebar.blade.php`. Current items:
+Defined in `resources/views/layouts/app/sidebar.blade.php`:
 
+```html
+<flux:sidebar.group :heading="__('Helpdesk')" class="grid">
+    <flux:sidebar.item icon="home"        :href="route('dashboard')"       ...>My Tickets</flux:sidebar.item>
+    <flux:sidebar.item icon="plus-circle" :href="route('tickets.create')"  ...>New Ticket</flux:sidebar.item>
+</flux:sidebar.group>
 ```
-Helpdesk (group heading)
-  ├── My Tickets    (icon: home)        → route('dashboard')
-  └── New Ticket    (icon: plus-circle) → route('tickets.create')
-```
-
-To add more nav items, add `<flux:sidebar.item>` inside the `Helpdesk` group.
 
 ---
 
-## Flux UI Conventions Used
+## UserFactory — Role Default
 
-| Purpose | Component |
-|---------|-----------|
-| Page layout | `<x-layouts::app>` wrapping `<flux:main>` |
-| Select field | `<flux:select>` + `<flux:select.option>` |
-| Text area | `<flux:textarea>` |
-| Text input | `<flux:input>` |
-| File input | Native `<input type="file" wire:model="...">` (Flux has no file input component) |
-| Validation error | `<flux:error name="fieldName" />` |
-| Field wrapper | `<flux:field>` + `<flux:label>` + `<flux:description>` |
-| Flash messages | `<flux:callout variant="success">` |
-| Buttons | `<flux:button variant="primary|ghost|outline">` |
-| Badges/Pills | Tailwind inline `<span>` (Flux badge not used for status/priority rows) |
+`database/factories/UserFactory.php` explicitly sets `'role' => UserRole::User` in `definition()`. This is required — relying on the SQLite DB column default during factory mass-insert is unreliable in tests.
+
+Factory states available: `->itStaff()`, `->admin()`, `->unverified()`, `->withTwoFactor()`.
 
 ---
 
 ## Ownership Policy
 
-`Show` component enforces ownership manually:
+`⚡show.blade.php` enforces ownership in `mount()`:
 
 ```php
 public function mount(Ticket $ticket): void
@@ -131,21 +182,23 @@ public function mount(Ticket $ticket): void
     if ($ticket->user_id !== auth()->id()) {
         abort(403);
     }
+    $this->ticket = $ticket->load(['department', 'attachments', 'assignee']);
 }
 ```
 
-There is **no Laravel Policy class** yet. If a Policy is added later, replace the manual check with `$this->authorize('view', $ticket)`.
+There is **no Laravel Policy class** yet. If a Policy is added, replace the manual check with `$this->authorize('view', $ticket)`.
 
 ---
 
-## Enum Usage in Views
+## Flux UI Conventions
 
-Priority and Category enums are iterated with `::cases()` to populate selects:
-
-```blade
-@foreach ($priorities as $p)
-    <flux:select.option value="{{ $p->value }}">{{ $p->getLabel() }}</flux:select.option>
-@endforeach
-```
-
-Status/Priority badge colors are mapped with a PHP `$colorMap` array inside `@php` blocks in Blade — **not** via Filament's `getColor()` method (which resolves to Filament semantic tokens, not Tailwind classes).
+| Purpose | Component |
+|---------|-----------|
+| Select field | `<flux:select>` + `<flux:select.option>` |
+| Text area | `<flux:textarea>` |
+| Text input | `<flux:input>` |
+| File input | Native `<input type="file" wire:model="...">` (Flux has no file component) |
+| Validation errors | `<flux:error name="fieldName" />` |
+| Field wrapper | `<flux:field>` + `<flux:label>` + `<flux:description>` |
+| Flash messages | `<flux:callout variant="success\|danger">` |
+| Buttons | `<flux:button variant="primary\|ghost\|outline">` |
