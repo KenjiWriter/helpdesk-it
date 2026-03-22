@@ -75,6 +75,7 @@ database/migrations/
 | Modifying sidebar nav or Flux UI components | `.antigravity/skills/livewire_flux_frontend.md` |
 | Working with Ticket Policies or Filament Widgets | `.antigravity/skills/authorization_and_widgets.md` |
 | Modifying ticket notifications or observer logic | `.antigravity/skills/notifications_and_observers.md` |
+| Changing locale strings or user policy access rules | `.antigravity/skills/i18n_and_user_management.md` |
 
 ---
 

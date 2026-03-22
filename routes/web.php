@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified', 'role.user'])->group(function () {
     Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
