@@ -38,7 +38,10 @@ app/
     Resources/     TicketResource (+ Pages/)
   Providers/
     Filament/      HelpdeskPanelProvider  (/helpdesk path)
-  Livewire/        (user-facing components — not yet built)
+  Http/
+    Middleware/    EnsureUserRole  (role.user alias — user-facing gate)
+  Livewire/
+    Pages/         Dashboard, Tickets/Create, Tickets/Show
 
 database/migrations/
   2026_03_21_000001_create_departments_table
@@ -48,8 +51,9 @@ database/migrations/
   2026_03_21_000005_create_ticket_attachments_table
 
 .antigravity/skills/
-  database_schema.md       ← DB schema, enums, relationships
-  filament_conventions.md  ← Filament API rules, property types, install steps
+  database_schema.md           ← DB schema, enums, relationships
+  filament_conventions.md      ← Filament API rules, property types, install steps
+  livewire_flux_frontend.md    ← User frontend: routes, components, file uploads, Flux UI
 ```
 
 ---
@@ -64,6 +68,8 @@ database/migrations/
 | Querying models or adding relationships | `.antigravity/skills/database_schema.md` |
 | Creating/editing Filament resources, pages, or panels | `.antigravity/skills/filament_conventions.md` |
 | Adding Filament form fields, table columns, or filters | `.antigravity/skills/filament_conventions.md` |
+| Creating/editing Livewire user pages or file uploads | `.antigravity/skills/livewire_flux_frontend.md` |
+| Modifying sidebar nav or Flux UI components | `.antigravity/skills/livewire_flux_frontend.md` |
 
 ---
 
@@ -84,8 +90,7 @@ The Filament IT panel is available at: `http://localhost:8000/helpdesk`
 
 ## What Is NOT Built Yet
 
-- Livewire/Flux frontend for regular users (ticket creation, status tracking)
 - Ticket messaging thread UI
-- File attachment upload UI
 - Dashboard stats/widgets in Filament
 - Email notifications
+- Laravel Policy for `Ticket` (ownership is currently checked manually in `Show::mount()`)

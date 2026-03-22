@@ -1,0 +1,151 @@
+<?php
+
+use App\Enums\TicketStatus;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+new #[Title('My Tickets')] class extends Component {
+    use WithPagination;
+
+    public function with(): array
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        $tickets = $user->tickets()
+            ->with(['department'])
+            ->latest()
+            ->paginate(10);
+
+        $totalCount    = $user->tickets()->count();
+        $openCount     = $user->tickets()->open()->count();
+        $resolvedCount = $user->tickets()->whereIn('status', [
+            TicketStatus::Resolved->value,
+            TicketStatus::Closed->value,
+        ])->count();
+
+        return compact('tickets', 'totalCount', 'openCount', 'resolvedCount');
+    }
+}; ?>
+
+<div>
+    <!-- Flash success -->
+    @if (session('success'))
+        <flux:callout variant="success" icon="check-circle" class="mb-6">
+            {{ session('success') }}
+        </flux:callout>
+    @endif
+
+    <!-- Page header -->
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <flux:heading size="xl" level="1">My Tickets</flux:heading>
+            <flux:subheading>Track all the IT support requests you have submitted.</flux:subheading>
+        </div>
+        <flux:button variant="primary" icon="plus" href="{{ route('tickets.create') }}" wire:navigate>
+            New Ticket
+        </flux:button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Total submitted</flux:text>
+            <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-white">{{ $totalCount }}</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Currently open</flux:text>
+            <p class="mt-1 text-3xl font-bold text-blue-600 dark:text-blue-400">{{ $openCount }}</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">Resolved / Closed</flux:text>
+            <p class="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">{{ $resolvedCount }}</p>
+        </div>
+    </div>
+
+    @if ($tickets->isEmpty())
+        <!-- Empty state -->
+        <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-20 text-center dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:icon.ticket class="mb-4 size-12 text-zinc-400" />
+            <flux:heading size="lg">No tickets yet</flux:heading>
+            <flux:subheading class="mt-1 max-w-sm">
+                Run into a tech problem? Submit your first support ticket and our IT team will get right on it.
+            </flux:subheading>
+            <flux:button variant="primary" icon="plus" class="mt-6" href="{{ route('tickets.create') }}" wire:navigate>
+                Submit a Ticket
+            </flux:button>
+        </div>
+    @else
+        <!-- Tickets table -->
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+            <table class="w-full text-sm">
+                <thead class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">#</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Category</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Priority</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Department</th>
+                        <th class="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Submitted</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    @foreach ($tickets as $ticket)
+                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                            <td class="px-4 py-3 font-mono text-zinc-400 dark:text-zinc-500">#{{ $ticket->id }}</td>
+                            <td class="px-4 py-3 font-medium text-zinc-900 dark:text-white">
+                                {{ $ticket->category->getLabel() }}
+                            </td>
+                            <td class="px-4 py-3">
+                                @php
+                                    $priorityColors = [
+                                        'normal' => 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+                                        'urgent' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+                                        'fire'   => 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+                                    ];
+                                @endphp
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $priorityColors[$ticket->priority->value] ?? '' }}">
+                                    {{ $ticket->priority->getLabel() }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                @php
+                                    $statusColors = [
+                                        'new'             => 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+                                        'in_progress'     => 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+                                        'waiting_on_user' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+                                        'suspended'       => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
+                                        'resolved'        => 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+                                        'closed'          => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
+                                    ];
+                                @endphp
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColors[$ticket->status->value] ?? '' }}">
+                                    {{ $ticket->status->getLabel() }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-zinc-500 dark:text-zinc-400">
+                                {{ $ticket->department?->name ?? '—' }}
+                            </td>
+                            <td class="px-4 py-3 text-zinc-500 dark:text-zinc-400">
+                                {{ $ticket->created_at->diffForHumans() }}
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <flux:button size="sm" variant="ghost" href="{{ route('tickets.show', $ticket) }}" wire:navigate>
+                                    View
+                                </flux:button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            @if ($tickets->hasPages())
+                <div class="border-t border-zinc-200 px-4 py-3 dark:border-zinc-700">
+                    {{ $tickets->links() }}
+                </div>
+            @endif
+        </div>
+    @endif
+</div>
