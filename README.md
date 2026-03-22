@@ -1,17 +1,17 @@
-# 🏗️ REGANTA IT Helpdesk
+# 🏗️ Enterprise IT Helpdesk
 
 [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![Filament 5](https://img.shields.io/badge/Filament-5.x-F37021?style=for-the-badge&logo=filament)](https://filamentphp.com)
 [![Livewire 4](https://img.shields.io/badge/Livewire-4.x-4e56a6?style=for-the-badge&logo=livewire)](https://livewire.laravel.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
 
-An enterprise-grade, custom-built IT Helpdesk ecosystem designed specifically for **REGANTA**. This system provides a seamless, high-performance bridge between employees and the IT support department, featuring a state-of-the-art dual-interface architecture.
+A highly customizable, enterprise-grade IT Helpdesk ecosystem designed for any medium-to-large organization. This system provides a seamless, high-performance bridge between employees and the IT support department, featuring a state-of-the-art dual-interface architecture.
 
 ---
 
 ## 🚀 Project Overview
 
-The REGANTA IT Helpdesk is more than just a ticketing tool; it's a comprehensive service management platform. It leverages the latest PHP 8.3 and Laravel 12 features to provide a robust, scalable, and highly interactive experience for both support seekers and IT technicians.
+The Enterprise IT Helpdesk is a robust service management platform built for flexibility and scale. It leverages the latest PHP 8.3 and Laravel 12 features to provide a professional, highly interactive experience that can be easily tailored to any corporate environment.
 
 ---
 
@@ -19,7 +19,7 @@ The REGANTA IT Helpdesk is more than just a ticketing tool; it's a comprehensive
 
 ### 🖥️ Dual-Interface Architecture
 - **Employee Portal**: A modern, high-speed frontend built with **Livewire 4**, **Volt**, and **Flux UI**. Employees can submit tickets, attach evidence, and chat in real-time with technicians.
-- **IT Control Center**: A customized **Filament 5.4.1** administration panel for IT Staff and Admins. It features advanced resource management, filtering, and real-time activity streams.
+- **IT Control Center**: A professional **Filament 5.4.1** administration panel for IT Staff and Admins. It features advanced resource management, filtering, and real-time activity streams.
 
 ### 🔄 Interactive Status Pipeline
 Tickets follow a strict, logical lifecycle to ensure no request is lost:
@@ -33,8 +33,8 @@ Every action (status change, assignment, new message) is automatically logged in
 - **Resolution SLAs**: Calculation of average resolution times across all tickets, formatted for executive review.
 - **Visual Dashboards**: Interactive widgets showing "Resolved Today", "Urgent/Fire" tickets, and latest system activity.
 
-### 🎨 REGANTA Corporate Branding
-The entire UI is tailored to REGANTA's corporate identity, utilizing the signature **Reganta Orange (#F37021)** and high-quality typography.
+### 🎨 Customizable Corporate Branding
+The UI is fully tailorable to any corporate identity. By default, it utilizes a primary accent color (**Orange #F37021**) and high-quality typography, both of which serve as an easily interchangeable theme to match any brand guidelines.
 
 ---
 
@@ -51,7 +51,7 @@ The entire UI is tailored to REGANTA's corporate identity, utilizing the signatu
 
 ## ⚙️ Setup & Installation
 
-Follow these steps to get the REGANTA Helpdesk running locally:
+Follow these steps to get the IT Helpdesk running locally:
 
 1. **Clone & Install**:
    ```bash
@@ -93,4 +93,4 @@ Follow these steps to get the REGANTA Helpdesk running locally:
 - **Flux Component Synergy**: Use of the Flux UI library ensures a premium, high-interaction frontend consistent with modern web standards.
 
 ---
-*Developed with excellence for REGANTA.*
+*Developed with excellence for enterprise service management.*
