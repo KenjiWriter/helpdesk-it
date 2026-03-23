@@ -15,6 +15,18 @@ The Enterprise IT Helpdesk is a robust service management platform built for fle
 
 ---
 
+## 🌐 Live Demo
+
+Experience the full capabilities of the Enterprise IT Helpdesk at **[https://it-helpdesk.cerasusdigital.pl](https://it-helpdesk.cerasusdigital.pl)**.
+
+### How to explore the demo:
+
+1. **Step 1 (Employee Portal):** Go to [https://it-helpdesk.cerasusdigital.pl/dashboard](https://it-helpdesk.cerasusdigital.pl/dashboard) and log in as a regular user (`user1@example.com` / Password: `password`). Create a new support ticket and explore the user dashboard.
+2. **Step 2 (IT Control Center):** Log out, then go to [https://it-helpdesk.cerasusdigital.pl/helpdesk](https://it-helpdesk.cerasusdigital.pl/helpdesk). Log in as an IT Technician (`it1@example.com` / Password: `password`) or Admin (`admin@example.com` / Password: `password`).
+3. **Step 3 (Resolve):** Claim the newly created ticket, use the Interactive Status Pipeline to change its status, add a message, and observe the automated Audit Trail recording your actions.
+
+---
+
 ## ✨ Key Features
 
 ### 🖥️ Dual-Interface Architecture
