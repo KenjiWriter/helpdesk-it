@@ -33,8 +33,9 @@ A custom IT Helpdesk application. Users submit support tickets; IT Staff manage 
 ```
 app/
   Enums/           UserRole, TicketPriority, TicketCategory, TicketStatus
-  Models/          User, Department, Ticket, TicketMessage, TicketAttachment
+  Models/          User, Department, Ticket, TicketMessage, TicketAttachment, Setting
   Filament/
+    Pages/         ManageBranding (System Ustawienia)
     Resources/     TicketResource (+ Pages/)
   Providers/
     Filament/      HelpdeskPanelProvider  (/helpdesk path)

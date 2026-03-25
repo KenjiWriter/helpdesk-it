@@ -51,9 +51,23 @@ Whenever adding primary buttons, active states, or loading spinners (`wire:loadi
 
 The IT Staff IT Helpdesk panel (`/helpdesk`) is powered by Filament. Branding is configured centrally within the `HelpdeskPanelProvider.php`.
 
+The application implements a **Dynamic Branding** feature:
+- Admins can customize the **App Name** and **App Logo** directly via the `/helpdesk` administration panel (`ManageBranding` page).
+- A **Show Logo Only** toggle allows hiding the App Name if a graphic logo is preferred.
+- Settings are saved to the `settings` database table, securely cached in `app_settings` forever (auto-cleared on save).
+
 ```php
 // app/Providers/Filament/HelpdeskPanelProvider.php
-->brandName('REGANTA Helpdesk')
+$appLogoUrl = null;
+if ($appLogo = Setting::get('app_logo')) {
+    $appLogoUrl = asset('storage/' . $appLogo);
+}
+
+// Fallback to text if there's no logo uploaded
+$finalBrandName = ($showLogoOnly && $appLogoUrl) ? '' : $appName;
+
+->brandName($finalBrandName)
+->brandLogo($appLogoUrl)
 ->colors([
     'primary' => Color::hex('#F37021'),
 ])

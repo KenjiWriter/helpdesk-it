@@ -47,6 +47,7 @@ Every action (status change, assignment, new message) is automatically logged in
 
 ### 🎨 Customizable Corporate Branding
 The UI is fully tailorable to any corporate identity. By default, it utilizes a primary accent color (**Orange #F37021**) and high-quality typography, both of which serve as an easily interchangeable theme to match any brand guidelines.
+- **Dynamic Branding Panel**: Admins can instantly change the Application Name, upload a custom brand Logo, and activate a "Show Logo Only" mode to hide text. All of this can be managed directly from the Filament Control Center (`Ustawienia wyglądu`) without touching any code or configuration files.
 
 ---
 

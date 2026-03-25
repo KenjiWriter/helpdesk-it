@@ -27,12 +27,31 @@ class HelpdeskPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $appName = \App\Models\Setting::get('app_name', 'REGANTA Helpdesk');
+        $appLogo = \App\Models\Setting::get('app_logo');
+        $showLogoOnly = (bool) \App\Models\Setting::get('show_logo_only', false);
+
+        $appLogoUrl = null;
+        if ($appLogo) {
+            $appLogoUrl = asset('storage/' . $appLogo);
+        }
+
+        // Fallback to text if there's no logo uploaded, even if showLogoOnly is true
+        $finalBrandName = ($showLogoOnly && $appLogoUrl) ? '' : $appName;
+
+        $panelConfig = $panel
             ->default()
             ->id('helpdesk')
             ->path('helpdesk')
             ->login()
-            ->brandName('REGANTA Helpdesk')
+            ->brandName($finalBrandName);
+
+        if ($appLogoUrl) {
+            $panelConfig->brandLogo($appLogoUrl)
+                        ->brandLogoHeight('3rem');
+        }
+
+        return $panelConfig
             ->colors([
                 'primary' => Color::hex('#F37021'),
             ])
