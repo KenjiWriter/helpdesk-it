@@ -23,6 +23,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use App\Http\Middleware\FilamentAuthenticate;
+
 class HelpdeskPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -43,7 +45,6 @@ class HelpdeskPanelProvider extends PanelProvider
             ->default()
             ->id('helpdesk')
             ->path('helpdesk')
-            ->login()
             ->brandName($finalBrandName);
 
         if ($appLogoUrl) {
@@ -78,7 +79,7 @@ class HelpdeskPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                FilamentAuthenticate::class,
             ]);
     }
 }
