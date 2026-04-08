@@ -8,14 +8,20 @@ use App\Enums\UserRole;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Notifications\NewTicketMessageNotification;
+use App\Services\TicketService;
 use Illuminate\Support\Facades\Notification;
 
 class TicketMessageObserver
 {
+    public function __construct(
+        private readonly TicketService $ticketService,
+    ) {}
+
     /**
-     * Route a new message notification to the appropriate recipient(s).
+     * Route a new message notification to the appropriate recipient(s)
+     * and update the unread-reply state via the TicketService.
      *
-     * - IT Staff / Admin author → notify the ticket owner.
+     * - IT Staff / Admin author → notify the ticket owner + mark ticket unread.
      * - User author, assigned ticket → notify the assignee.
      * - User author, unassigned ticket → notify all IT Staff.
      */
@@ -31,6 +37,9 @@ class TicketMessageObserver
         if (in_array($author->role, [UserRole::ItStaff, UserRole::Admin], strict: true)) {
             // IT Staff / Admin replied — notify the ticket owner.
             $ticket->user->notify($notification);
+
+            // Delegate flag mutation to the Service Layer.
+            $this->ticketService->markAsUnread($ticket);
 
             return;
         }

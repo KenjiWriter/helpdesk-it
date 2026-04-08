@@ -31,23 +31,39 @@ class TicketStatusChangedNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         $ticket    = $this->ticket;
-        $newStatus = $ticket->status->getLabel();
-        $oldStatus = $this->oldStatus->getLabel();
+        $newStatus = $ticket->status;
+        $oldStatus = $this->oldStatus;
         $ticketUrl = url('/tickets/' . $ticket->id);
+        $isResolved = $newStatus === TicketStatus::Resolved;
 
-        $message = (new MailMessage)
-            ->subject("Your Ticket #{$ticket->id} status changed to {$newStatus}")
-            ->greeting("Hello, {$notifiable->name}!")
-            ->line("The status of your support ticket **#{$ticket->id}** has been updated.")
-            ->line("**Previous status:** {$oldStatus}")
-            ->line("**New status:** {$newStatus}");
+        // Map status values to template CSS class names.
+        $newStatusClass = match ($newStatus) {
+            TicketStatus::Resolved   => 'new-resolved',
+            TicketStatus::Closed     => 'new-closed',
+            TicketStatus::InProgress => 'new-in_progress',
+            TicketStatus::New        => 'new-new',
+        };
 
-        if ($ticket->status === TicketStatus::Resolved) {
-            $message->line('Your issue has been marked as resolved. Please let us know if you need further assistance or rate the support you received.');
-        }
+        // Map status to the header accent bar CSS class.
+        $accentClass = match ($newStatus) {
+            TicketStatus::Resolved   => 'resolved',
+            TicketStatus::Closed     => 'closed',
+            TicketStatus::InProgress => 'in_progress',
+            TicketStatus::New        => 'default',
+        };
 
-        return $message
-            ->action("View Your Ticket #{$ticket->id}", $ticketUrl)
-            ->line('Thank you for using the IT Helpdesk.');
+        return (new MailMessage)
+            ->subject("Ticket #{$ticket->id} status changed to {$newStatus->getLabel()}")
+            ->view('emails.ticket-status-changed', compact(
+                'notifiable',
+                'ticket',
+                'newStatus',
+                'oldStatus',
+                'ticketUrl',
+                'isResolved',
+                'newStatusClass',
+                'accentClass',
+            ));
     }
 }
+

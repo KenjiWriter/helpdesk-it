@@ -32,14 +32,17 @@ class NewTicketMessageNotification extends Notification implements ShouldQueue
         $ticket    = $message->ticket;
         $author    = $message->user;
         $ticketUrl = url('/tickets/' . $ticket->id);
-        $snippet   = str($message->body)->limit(300);
+        $snippet   = $message->body;
 
         return (new MailMessage)
-            ->subject("New reply on Ticket #{$ticket->id}")
-            ->greeting("Hello, {$notifiable->name}!")
-            ->line("**{$author->name}** has replied to support ticket **#{$ticket->id}**.")
-            ->line("> {$snippet}")
-            ->action("View Ticket #{$ticket->id}", $ticketUrl)
-            ->line('Please log in to view the full message thread and respond.');
+            ->subject("New Reply on Ticket #{$ticket->id} — {$ticket->category->getLabel()}")
+            ->view('emails.ticket-message', compact(
+                'notifiable',
+                'ticket',
+                'author',
+                'ticketUrl',
+                'snippet',
+            ));
     }
 }
+

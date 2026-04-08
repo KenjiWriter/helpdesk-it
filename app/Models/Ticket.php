@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'resolved_at',
     'rating_time',
     'rating_quality',
+    'has_unread_reply',
 ])]
 class Ticket extends Model
 {
@@ -40,10 +41,11 @@ class Ticket extends Model
     protected function casts(): array
     {
         return [
-            'priority'    => TicketPriority::class,
-            'category'    => TicketCategory::class,
-            'status'      => TicketStatus::class,
-            'resolved_at' => 'datetime',
+            'priority'         => TicketPriority::class,
+            'category'         => TicketCategory::class,
+            'status'           => TicketStatus::class,
+            'resolved_at'      => 'datetime',
+            'has_unread_reply' => 'boolean',
         ];
     }
 

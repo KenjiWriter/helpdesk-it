@@ -167,5 +167,9 @@
     "Delete account": "Usuń konto",
     "Delete your account and all of its resources": "Usuń swoje konto i wszystkie powiązane zasoby",
     "Are you sure you want to delete your account?": "Czy na pewno chcesz usunąć swoje konto?",
-    "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.": "Po usunięciu konta wszystkie jego zasoby i dane zostaną trwale usunięte. Podaj swoje hasło, aby potwierdzić, że chcesz trwale usunąć konto."
+    "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.": "Po usunięciu konta wszystkie jego zasoby i dane zostaną trwale usunięte. Podaj swoje hasło, aby potwierdzić, że chcesz trwale usunąć konto.",
+
+    "Unread IT Replies": "Nieprzeczytane odpowiedzi IT",
+    "New Reply": "Nowa odpowiedź",
+    "New IT Reply": "Nowa odpowiedź IT"
 }

@@ -24,8 +24,9 @@ new #[Title('Moje zgłoszenia')] class extends Component {
             TicketStatus::Resolved->value,
             TicketStatus::Closed->value,
         ])->count();
+        $unreadCount = $user->tickets()->where('has_unread_reply', true)->count();
 
-        return compact('tickets', 'totalCount', 'openCount', 'resolvedCount');
+        return compact('tickets', 'totalCount', 'openCount', 'resolvedCount', 'unreadCount');
     }
 }; ?>
 
@@ -48,8 +49,8 @@ new #[Title('Moje zgłoszenia')] class extends Component {
         </flux:button>
     </div>
 
-    <!-- Stats row -->
-    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <!-- Stats row (4 columns) -->
+    <div class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Total submitted') }}</flux:text>
             <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-white">{{ $totalCount }}</p>
@@ -61,6 +62,15 @@ new #[Title('Moje zgłoszenia')] class extends Component {
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Resolved / Closed') }}</flux:text>
             <p class="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">{{ $resolvedCount }}</p>
+        </div>
+        {{-- Unread IT replies stat — glows orange when > 0 --}}
+        <div class="rounded-xl border p-5 transition-colors {{ $unreadCount > 0 ? 'border-accent/40 bg-accent/5 dark:border-accent/30 dark:bg-accent/10' : 'border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900' }}">
+            <flux:text size="sm" class="{{ $unreadCount > 0 ? 'text-accent' : 'text-zinc-500 dark:text-zinc-400' }}">
+                {{ __('Unread IT Replies') }}
+            </flux:text>
+            <p class="mt-1 text-3xl font-bold {{ $unreadCount > 0 ? 'text-accent' : 'text-zinc-900 dark:text-white' }}">
+                {{ $unreadCount }}
+            </p>
         </div>
     </div>
 
@@ -93,10 +103,23 @@ new #[Title('Moje zgłoszenia')] class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                     @foreach ($tickets as $ticket)
-                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                            <td class="px-4 py-3 font-mono text-zinc-400 dark:text-zinc-500">#{{ $ticket->id }}</td>
+                        @php $hasUnread = $ticket->has_unread_reply; @endphp
+                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 {{ $hasUnread ? 'ticket-unread-row' : '' }}">
+                            <td class="px-4 py-3 font-mono text-zinc-400 dark:text-zinc-500">
+                                #{{ $ticket->id }}
+                            </td>
                             <td class="px-4 py-3 font-medium text-zinc-900 dark:text-white">
-                                {{ $ticket->category->getLabel() }}
+                                <div class="flex items-center gap-2">
+                                    {{ $ticket->category->getLabel() }}
+                                    @if ($hasUnread)
+                                        <span class="bell-ring-animate inline-flex items-center" title="{{ __('New IT Reply') }}">
+                                            <flux:icon.bell class="size-4 text-accent" />
+                                        </span>
+                                        <span class="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
+                                            {{ __('New Reply') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 py-3">
                                 @php
@@ -113,12 +136,10 @@ new #[Title('Moje zgłoszenia')] class extends Component {
                             <td class="px-4 py-3">
                                 @php
                                     $statusColors = [
-                                        'new'             => 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-                                        'in_progress'     => 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
-                                        'waiting_on_user' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
-                                        'suspended'       => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
-                                        'resolved'        => 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
-                                        'closed'          => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
+                                        'new'         => 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+                                        'in_progress' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+                                        'resolved'    => 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+                                        'closed'      => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
                                     ];
                                 @endphp
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColors[$ticket->status->value] ?? '' }}">
@@ -132,7 +153,12 @@ new #[Title('Moje zgłoszenia')] class extends Component {
                                 {{ $ticket->created_at->diffForHumans() }}
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <flux:button size="sm" variant="ghost" href="{{ route('tickets.show', $ticket) }}" wire:navigate>
+                                <flux:button
+                                    size="sm"
+                                    variant="{{ $hasUnread ? 'primary' : 'ghost' }}"
+                                    href="{{ route('tickets.show', $ticket) }}"
+                                    wire:navigate
+                                >
                                     {{ __('View') }}
                                 </flux:button>
                             </td>

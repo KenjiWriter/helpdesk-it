@@ -3,6 +3,7 @@
 use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Enums\TicketStatus;
+use App\Services\TicketService;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -25,6 +26,11 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
         \Illuminate\Support\Facades\Gate::authorize('view', $ticket);
 
         $this->ticket = $ticket->load(['department', 'attachments', 'assignee', 'messages.user']);
+
+        // Clear the unread-reply flag via the Service Layer when the user opens the ticket.
+        if ($this->ticket->has_unread_reply) {
+            app(TicketService::class)->markAsRead($this->ticket);
+        }
     }
 
     public function addMessage(): void
