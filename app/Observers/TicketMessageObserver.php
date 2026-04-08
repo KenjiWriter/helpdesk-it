@@ -36,7 +36,8 @@ class TicketMessageObserver
 
         if (in_array($author->role, [UserRole::ItStaff, UserRole::Admin], strict: true)) {
             // IT Staff / Admin replied — notify the ticket owner.
-            $ticket->user->notify($notification);
+            $locale = $ticket->user->locale ?? 'pl';
+            $ticket->user->notify((new NewTicketMessageNotification($message))->locale($locale));
 
             // Delegate flag mutation to the Service Layer.
             $this->ticketService->markAsUnread($ticket);
@@ -45,11 +46,15 @@ class TicketMessageObserver
         }
 
         // Regular user replied — notify the assigned IT Staff, or all staff if unassigned.
+        $this->ticketService->markAsUnreadByUser($ticket);
+        
+        $userReplyNotification = new \App\Notifications\UserRepliedToTicketNotification($message);
+
         if ($ticket->assignee_id !== null) {
-            $ticket->assignee->notify($notification);
+            $ticket->assignee->notify($userReplyNotification);
         } else {
             $itStaff = User::where('role', UserRole::ItStaff->value)->get();
-            Notification::send($itStaff, $notification);
+            Notification::send($itStaff, $userReplyNotification);
         }
     }
 }

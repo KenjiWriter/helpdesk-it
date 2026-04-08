@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>New Reply — Ticket #{{ $ticket->id }}</title>
+    <title>{{ __('emails.ticket_message.title', ['id' => $ticket->id]) }}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,32 +51,31 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                 </div>
-                <span class="header-logo-text">REGANTA Helpdesk</span>
+                <span class="header-logo-text">{{ __('emails.ticket_message.header_logo_text') }}</span>
             </div>
-            <div class="header-title">New Reply on Your Ticket</div>
-            <div class="header-subtitle">An IT team member has responded to your request.</div>
+            <div class="header-title">{{ __('emails.ticket_message.header_title') }}</div>
+            <div class="header-subtitle">{{ __('emails.ticket_message.header_subtitle') }}</div>
         </div>
 
         <!-- Body -->
         <div class="body">
-            <div class="greeting">Hello, {{ $notifiable->name }}!</div>
+            <div class="greeting">{{ __('emails.ticket_message.hello', ['name' => $notifiable->name]) }}</div>
             <p class="intro">
-                Your IT support ticket has received a new reply. Please log in to view the full message thread
-                and respond if needed.
+                {{ __('emails.ticket_message.intro') }}
             </p>
 
             <!-- Ticket Preview Card -->
             <div class="ticket-card">
                 <div class="ticket-card-header">
                     <span class="ticket-id">#{{ $ticket->id }} &mdash; {{ $ticket->category->getLabel() }}</span>
-                    <span class="ticket-badge">IT Reply</span>
+                    <span class="ticket-badge">{{ __('emails.ticket_message.badge_it_reply') }}</span>
                 </div>
                 <div class="ticket-card-body">
                     <div class="author-row">
                         <div class="author-avatar">{{ strtoupper(substr($author->name, 0, 1)) }}</div>
                         <div>
                             <div class="author-name">{{ $author->name }}</div>
-                            <span class="author-role">IT Staff</span>
+                            <span class="author-role">{{ __('emails.ticket_message.role_it_staff') }}</span>
                         </div>
                     </div>
                     <div class="message-preview">
@@ -87,14 +86,13 @@
 
             <!-- CTA -->
             <div class="cta-wrapper">
-                <a href="{{ $ticketUrl }}" class="cta-button">View Full Conversation &rarr;</a>
+                <a href="{{ $ticketUrl }}" class="cta-button">{{ __('emails.ticket_message.cta_button') }} &rarr;</a>
             </div>
 
             <hr class="divider" />
 
             <p style="font-size: 13px; color: #71717a; line-height: 1.7; text-align: center;">
-                If you did not expect this email, you can safely ignore it.<br />
-                This notification was sent to <strong>{{ $notifiable->email }}</strong>.
+                {!! __('emails.ticket_message.ignore_notice', ['email' => $notifiable->email]) !!}
             </p>
         </div>
 
@@ -102,12 +100,12 @@
         <div class="footer">
             <div class="footer-brand">
                 <div class="footer-brand-dot"></div>
-                <span style="font-size: 12px; color: #a1a1aa; font-weight: 600;">REGANTA IT Helpdesk</span>
+                <span style="font-size: 12px; color: #a1a1aa; font-weight: 600;">{{ __('emails.ticket_message.footer_brand') }}</span>
                 <div class="footer-brand-dot"></div>
             </div>
             <p class="footer-text">
-                &copy; {{ date('Y') }} REGANTA. All rights reserved.<br />
-                <a href="{{ url('/dashboard') }}" class="footer-link">Go to Dashboard</a>
+                &copy; {{ date('Y') }} {{ __('emails.ticket_message.footer_rights') }}<br />
+                <a href="{{ url('/dashboard') }}" class="footer-link">{{ __('emails.ticket_message.footer_dashboard') }}</a>
             </p>
         </div>
     </div>

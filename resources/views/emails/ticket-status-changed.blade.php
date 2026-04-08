@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Ticket #{{ $ticket->id }} — Status Updated</title>
+    <title>{{ __('emails.ticket_status.title', ['id' => $ticket->id]) }}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,17 +64,17 @@
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                     </svg>
                 </div>
-                <span class="header-logo-text">REGANTA Helpdesk</span>
+                <span class="header-logo-text">{{ __('emails.ticket_status.header_logo_text') }}</span>
             </div>
-            <div class="header-title">Ticket Status Updated</div>
-            <div class="header-subtitle">Your support request has moved to a new stage.</div>
+            <div class="header-title">{{ __('emails.ticket_status.header_title') }}</div>
+            <div class="header-subtitle">{{ __('emails.ticket_status.header_subtitle') }}</div>
         </div>
 
         <!-- Body -->
         <div class="body">
-            <div class="greeting">Hello, {{ $notifiable->name }}!</div>
+            <div class="greeting">{{ __('emails.ticket_status.hello', ['name' => $notifiable->name]) }}</div>
             <p class="intro">
-                The status of your IT support ticket <strong>#{{ $ticket->id }}</strong> has been updated by our team.
+                {!! __('emails.ticket_status.intro', ['id' => $ticket->id]) !!}
             </p>
 
             <!-- Status Flow Visualiser -->
@@ -87,15 +87,15 @@
             <!-- Ticket Meta -->
             <div class="ticket-meta">
                 <div class="ticket-meta-row" style="margin-bottom: 10px;">
-                    <span class="ticket-meta-label">Ticket ID</span>
+                    <span class="ticket-meta-label">{{ __('emails.ticket_status.ticket_id_label') }}</span>
                     <span class="ticket-meta-value" style="font-family: monospace;">#{{ $ticket->id }}</span>
                 </div>
                 <div class="ticket-meta-row" style="margin-bottom: 10px;">
-                    <span class="ticket-meta-label">Category</span>
+                    <span class="ticket-meta-label">{{ __('emails.ticket_status.category_label') }}</span>
                     <span class="ticket-meta-value">{{ $ticket->category->getLabel() }}</span>
                 </div>
                 <div class="ticket-meta-row">
-                    <span class="ticket-meta-label">New Status</span>
+                    <span class="ticket-meta-label">{{ __('emails.ticket_status.new_status_label') }}</span>
                     <span class="ticket-meta-value">{{ $newStatus->getLabel() }}</span>
                 </div>
             </div>
@@ -103,10 +103,9 @@
             <!-- Special callout if resolved -->
             @if ($isResolved)
                 <div class="resolved-callout">
-                    <div class="resolved-callout-title">&#10003; &nbsp;Your issue has been resolved!</div>
+                    <div class="resolved-callout-title">&#10003; &nbsp;{{ __('emails.ticket_status.resolved_title') }}</div>
                     <p class="resolved-callout-text">
-                        Our team has marked this ticket as resolved. Please click the button below to verify the
-                        solution and rate your experience. Your feedback helps us improve.
+                        {{ __('emails.ticket_status.resolved_text') }}
                     </p>
                 </div>
             @endif
@@ -114,17 +113,16 @@
             <!-- CTA -->
             <div class="cta-wrapper">
                 @if ($isResolved)
-                    <a href="{{ $ticketUrl }}" class="cta-button green">Rate &amp; Close Ticket &rarr;</a>
+                    <a href="{{ $ticketUrl }}" class="cta-button green">{{ __('emails.ticket_status.cta_button_resolved') }} &rarr;</a>
                 @else
-                    <a href="{{ $ticketUrl }}" class="cta-button">View Ticket #{{ $ticket->id }} &rarr;</a>
+                    <a href="{{ $ticketUrl }}" class="cta-button">{{ __('emails.ticket_status.cta_button', ['id' => $ticket->id]) }} &rarr;</a>
                 @endif
             </div>
 
             <hr class="divider" />
 
             <p style="font-size: 13px; color: #71717a; line-height: 1.7; text-align: center;">
-                If you did not expect this email, you can safely ignore it.<br />
-                This notification was sent to <strong>{{ $notifiable->email }}</strong>.
+                {!! __('emails.ticket_status.ignore_notice', ['email' => $notifiable->email]) !!}
             </p>
         </div>
 
@@ -132,12 +130,12 @@
         <div class="footer">
             <div class="footer-brand">
                 <div class="footer-brand-dot"></div>
-                <span style="font-size: 12px; color: #a1a1aa; font-weight: 600;">REGANTA IT Helpdesk</span>
+                <span style="font-size: 12px; color: #a1a1aa; font-weight: 600;">{{ __('emails.ticket_status.footer_brand') }}</span>
                 <div class="footer-brand-dot"></div>
             </div>
             <p class="footer-text">
-                &copy; {{ date('Y') }} REGANTA. All rights reserved.<br />
-                <a href="{{ url('/dashboard') }}" class="footer-link">Go to Dashboard</a>
+                &copy; {{ date('Y') }} {{ __('emails.ticket_status.footer_rights') }}<br />
+                <a href="{{ url('/dashboard') }}" class="footer-link">{{ __('emails.ticket_status.footer_dashboard') }}</a>
             </p>
         </div>
     </div>

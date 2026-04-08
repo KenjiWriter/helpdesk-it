@@ -18,12 +18,12 @@ enum TicketCategory: string implements HasLabel
     public function getLabel(): string
     {
         return match($this) {
-            TicketCategory::Access   => 'Access',
-            TicketCategory::Hardware => 'Hardware',
-            TicketCategory::Internet => 'Internet',
-            TicketCategory::Optima   => 'Optima',
-            TicketCategory::Grid     => 'Grid',
-            TicketCategory::Other    => 'Other',
+            TicketCategory::Access   => __('ticket_category.access'),
+            TicketCategory::Hardware => __('ticket_category.hardware'),
+            TicketCategory::Internet => __('ticket_category.internet'),
+            TicketCategory::Optima   => __('ticket_category.optima'),
+            TicketCategory::Grid     => __('ticket_category.grid'),
+            TicketCategory::Other    => __('ticket_category.other'),
         };
     }
 }

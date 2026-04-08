@@ -39,4 +39,28 @@ class TicketService
             $ticket->update(['has_unread_reply' => false]);
         }
     }
+
+    /**
+     * Mark a ticket as having an unread user reply.
+     *
+     * Called by TicketMessageObserver when a user posts a new reply.
+     */
+    public function markAsUnreadByUser(Ticket $ticket): void
+    {
+        if (! $ticket->has_unread_user_reply) {
+            $ticket->update(['has_unread_user_reply' => true]);
+        }
+    }
+
+    /**
+     * Mark a ticket's unread-user-reply indicator as cleared.
+     *
+     * Called when IT Staff opens the ticket detail/edit view.
+     */
+    public function markAsReadByItStaff(Ticket $ticket): void
+    {
+        if ($ticket->has_unread_user_reply) {
+            $ticket->update(['has_unread_user_reply' => false]);
+        }
+    }
 }

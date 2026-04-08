@@ -47,6 +47,7 @@ class TicketObserver
             ? $originalStatus
             : TicketStatus::from($originalStatus);
 
-        $ticket->user->notify(new TicketStatusChangedNotification($ticket, $oldStatus));
+        $locale = $ticket->user->locale ?? 'pl';
+        $ticket->user->notify((new TicketStatusChangedNotification($ticket, $oldStatus))->locale($locale));
     }
 }

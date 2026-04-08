@@ -34,6 +34,14 @@ class MessagesRelationManager extends RelationManager
                     ->required()
                     ->rows(4)
                     ->columnSpanFull(),
+
+                \Filament\Forms\Components\FileUpload::make('attachments')
+                    ->label(__('Attachments'))
+                    ->multiple()
+                    ->disk('public')
+                    ->directory('ticket-attachments')
+                    ->dehydrated(false)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -63,9 +71,33 @@ class MessagesRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label(__('New Message'))
-                    ->after(function (RelationManager $livewire) {
+                    ->after(function (CreateAction $action, RelationManager $livewire, $data) {
                         $ticket = $livewire->getOwnerRecord();
                         if ($ticket instanceof Ticket) {
+                            // Process unmapped attachments array
+                            $attachments = $data['attachments'] ?? [];
+                            foreach ($attachments as $path) {
+                                // Since we used a simple FileUpload, it gives us the final paths on the public disk.
+                                // We can use Storage::disk('public') to get file info.
+                                $fullPath = storage_path("app/public/{$path}");
+                                $fileName = basename($path);
+                                $mime = null;
+                                $size = null;
+
+                                if (file_exists($fullPath)) {
+                                    $size = filesize($fullPath);
+                                    $mime = mime_content_type($fullPath);
+                                }
+
+                                $ticket->attachments()->create([
+                                    'user_id' => auth()->id(),
+                                    'filename' => $fileName,
+                                    'path' => $path,
+                                    'mime_type' => $mime,
+                                    'size' => $size,
+                                ]);
+                            }
+
                             $ticket->histories()->create([
                                 'user_id' => auth()->id(),
                                 'description' => __('Dodano nową wiadomość'),

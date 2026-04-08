@@ -53,7 +53,7 @@ class TicketStatusChangedNotification extends Notification implements ShouldQueu
         };
 
         return (new MailMessage)
-            ->subject("Ticket #{$ticket->id} status changed to {$newStatus->getLabel()}")
+            ->subject(__('emails.ticket_status.updated_subject', ['id' => $ticket->id, 'status' => $newStatus->getLabel()]))
             ->view('emails.ticket-status-changed', compact(
                 'notifiable',
                 'ticket',

@@ -9,8 +9,15 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
+use Livewire\WithFileUploads;
+
 new #[Title('Podgląd zgłoszenia')] class extends Component {
+    use WithFileUploads;
+
     public Ticket $ticket;
+
+    /** @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile> */
+    public array $attachments = [];
 
     #[Validate('required|string|max:2000')]
     public string $newMessageBody = '';
@@ -43,16 +50,48 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
 
         $this->validateOnly('newMessageBody');
 
-        TicketMessage::create([
+        $message = TicketMessage::create([
             'ticket_id' => $this->ticket->id,
             'user_id' => auth()->id(),
             'body' => $this->newMessageBody,
         ]);
 
+        foreach ($this->attachments as $file) {
+            $path = $file->storePublicly('ticket-attachments', 'public');
+            $this->ticket->attachments()->create([
+                'user_id' => auth()->id(),
+                'filename' => $file->getClientOriginalName(),
+                'path' => $path,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+            ]);
+        }
+
         $this->newMessageBody = '';
-        $this->ticket->load('messages.user');
+        $this->attachments = [];
+        $this->ticket->load(['messages.user', 'attachments']);
 
         session()->flash('success', __('Message added successfully.'));
+    }
+
+    public function closeTicket(): void
+    {
+        $this->ticket->refresh();
+
+        if ($this->ticket->status->isTerminal()) {
+            return;
+        }
+
+        $this->ticket->update([
+            'status' => TicketStatus::Closed,
+        ]);
+
+        $this->ticket->histories()->create([
+            'user_id' => auth()->id(),
+            'description' => __('Status zmieniony na: :status przez użytkownika', ['status' => TicketStatus::Closed->getLabel()]),
+        ]);
+
+        session()->flash('success', __('The ticket is now closed.'));
     }
 
     public function submitRating(): void
@@ -81,10 +120,18 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
 }; ?>
 
 <div>
-    <!-- Back button -->
-    <flux:button variant="ghost" icon="arrow-left" href="{{ route('dashboard') }}" wire:navigate class="mb-6">
-        {{ __('Back to My Tickets') }}
-    </flux:button>
+    <div class="flex items-center justify-between mb-6">
+        <!-- Back button -->
+        <flux:button variant="ghost" icon="arrow-left" href="{{ route('dashboard') }}" wire:navigate>
+            {{ __('Back to My Tickets') }}
+        </flux:button>
+        
+        @if (! $ticket->status->isTerminal())
+            <flux:button variant="danger" wire:click="closeTicket" wire:confirm="{{ __('Are you sure you want to close this ticket?') }}">
+                {{ __('Close Ticket') }}
+            </flux:button>
+        @endif
+    </div>
 
     <!-- Flash success -->
     @if (session('success'))
@@ -242,6 +289,11 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
                         <flux:field>
                             <flux:textarea wire:model="newMessageBody" rows="4" :placeholder="__('Type your message here...')" />
                             <flux:error name="newMessageBody" />
+                        </flux:field>
+                        <flux:field>
+                            <flux:label>{{ __('Opis / Załączniki (Opcjonalnie)') }}</flux:label>
+                            <input type="file" wire:model="attachments" multiple class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-zinc-300" />
+                            <flux:error name="attachments.*" />
                         </flux:field>
                         <div class="flex justify-end">
                             <flux:button type="submit" variant="primary">{{ __('Send Message') }}</flux:button>

@@ -32,6 +32,15 @@ class EditTicket extends EditRecord
         return 'full';
     }
 
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+
+        if ($this->record->has_unread_user_reply) {
+            app(\App\Services\TicketService::class)->markAsReadByItStaff($this->record);
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         $statusActions = array_map(function (\App\Enums\TicketStatus $status) {

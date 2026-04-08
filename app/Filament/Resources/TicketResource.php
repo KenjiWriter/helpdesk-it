@@ -141,6 +141,14 @@ class TicketResource extends Resource
             ->recordAction(\Filament\Tables\Actions\EditAction::class)
             ->defaultSort('created_at', 'desc')
             ->columns([
+                \Filament\Tables\Columns\IconColumn::make('has_unread_user_reply')
+                    ->label('')
+                    ->boolean()
+                    ->trueIcon('heroicon-s-bell')
+                    ->trueColor('danger')
+                    ->falseIcon(fn() => null)
+                    ->tooltip(__('Nowa wiadomość od użytkownika')),
+
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable()

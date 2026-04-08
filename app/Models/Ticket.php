@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'rating_time',
     'rating_quality',
     'has_unread_reply',
+    'has_unread_user_reply',
 ])]
 class Ticket extends Model
 {
@@ -46,6 +47,7 @@ class Ticket extends Model
             'status'           => TicketStatus::class,
             'resolved_at'      => 'datetime',
             'has_unread_reply' => 'boolean',
+            'has_unread_user_reply' => 'boolean',
         ];
     }
 

@@ -111,10 +111,10 @@ test('user_message_notifies_assigned_staff', function (): void {
 
     Notification::assertSentTo(
         $staff,
-        NewTicketMessageNotification::class,
-        fn (NewTicketMessageNotification $n) => $n->message->ticket_id === $ticket->id,
+        \App\Notifications\UserRepliedToTicketNotification::class,
+        fn (\App\Notifications\UserRepliedToTicketNotification $n) => $n->message->ticket_id === $ticket->id,
     );
-    Notification::assertNotSentTo($owner, NewTicketMessageNotification::class);
+    Notification::assertNotSentTo($owner, \App\Notifications\UserRepliedToTicketNotification::class);
 });
 
 test('user_message_notifies_all_staff_when_unassigned', function (): void {
@@ -132,7 +132,7 @@ test('user_message_notifies_all_staff_when_unassigned', function (): void {
         'user_id'   => $owner->id,
     ]);
 
-    Notification::assertSentTo($staff1, NewTicketMessageNotification::class);
-    Notification::assertSentTo($staff2, NewTicketMessageNotification::class);
-    Notification::assertNotSentTo($owner, NewTicketMessageNotification::class);
+    Notification::assertSentTo($staff1, \App\Notifications\UserRepliedToTicketNotification::class);
+    Notification::assertSentTo($staff2, \App\Notifications\UserRepliedToTicketNotification::class);
+    Notification::assertNotSentTo($owner, \App\Notifications\UserRepliedToTicketNotification::class);
 });

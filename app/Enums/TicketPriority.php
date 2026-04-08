@@ -16,9 +16,9 @@ enum TicketPriority: string implements HasLabel, HasColor
     public function getLabel(): string
     {
         return match($this) {
-            TicketPriority::Normal => 'Normal',
-            TicketPriority::Urgent => 'Urgent',
-            TicketPriority::Fire   => 'Fire 🔥',
+            TicketPriority::Normal => __('ticket_priority.normal'),
+            TicketPriority::Urgent => __('ticket_priority.urgent'),
+            TicketPriority::Fire   => __('ticket_priority.fire'),
         };
     }
 

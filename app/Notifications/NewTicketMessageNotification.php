@@ -35,7 +35,7 @@ class NewTicketMessageNotification extends Notification implements ShouldQueue
         $snippet   = $message->body;
 
         return (new MailMessage)
-            ->subject("New Reply on Ticket #{$ticket->id} — {$ticket->category->getLabel()}")
+            ->subject(__('emails.ticket_message.new_reply_subject', ['id' => $ticket->id, 'category' => $ticket->category->getLabel()]))
             ->view('emails.ticket-message', compact(
                 'notifiable',
                 'ticket',
