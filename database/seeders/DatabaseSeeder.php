@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create IT Department
+        $itDepartment = \App\Models\Department::firstOrCreate(['name' => 'IT']);
+
         // Create Admin
         User::factory()->admin()->create([
             'name' => 'System Admin',

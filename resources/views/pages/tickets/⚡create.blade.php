@@ -21,6 +21,14 @@ new #[Title('Nowe zgłoszenie')] class extends Component {
     /** @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile> */
     public array $attachments = [];
 
+    public function mount(): void
+    {
+        $departments = Department::all();
+        if ($departments->count() === 1) {
+            $this->department_id = $departments->first()->id;
+        }
+    }
+
     protected function rules(): array
     {
         $priorityValues = implode(',', array_column(TicketPriority::cases(), 'value'));
@@ -32,7 +40,7 @@ new #[Title('Nowe zgłoszenie')] class extends Component {
             'description'   => 'required|string|min:10|max:5000',
             'department_id' => 'nullable|exists:departments,id',
             'hardware_name' => 'nullable|string|max:255',
-            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,pdf|max:4096',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,pdf|max:20480',
         ];
     }
 
@@ -41,6 +49,7 @@ new #[Title('Nowe zgłoszenie')] class extends Component {
         return [
             'category.required' => __('Please select a problem category.'),
             'description.min'   => __('Description must be at least 10 characters.'),
+            'attachments.*.max' => __('Załącznik :attribute nie może być większy niż 20MB'),
         ];
     }
 
@@ -147,9 +156,9 @@ new #[Title('Nowe zgłoszenie')] class extends Component {
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <flux:field>
                     <flux:label>{{ __('Department') }}</flux:label>
-                    <flux:select wire:model="department_id" id="department_id" :placeholder="__('Select your department…')">
+                    <flux:select wire:model="department_id" id="department_id" :placeholder="__('Wybierz swój dział...')">
                         @foreach ($departments as $dept)
-                            <flux:select.option value="{{ $dept->id }}">{{ $dept->name }}</flux:select.option>
+                            <flux:select.option :value="$dept->id">{{ $dept->name }}</flux:select.option>
                         @endforeach
                     </flux:select>
                     <flux:error name="department_id" />
@@ -185,7 +194,7 @@ new #[Title('Nowe zgłoszenie')] class extends Component {
                     accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
                     class="block w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-blue-700 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
                 />
-                <flux:description>{{ __('Screenshots or photos. JPG, PNG, GIF, WebP, PDF — max 4 MB each.') }}</flux:description>
+                <flux:description>{{ __('Screenshots or photos. JPG, PNG, GIF, WebP, PDF — max 20 MB each.') }}</flux:description>
                 <flux:error name="attachments.*" />
 
                 @if ($attachments)

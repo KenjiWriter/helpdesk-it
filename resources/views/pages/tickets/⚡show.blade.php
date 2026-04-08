@@ -4,6 +4,7 @@ use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Enums\TicketStatus;
 use App\Services\TicketService;
+use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -14,10 +15,24 @@ use Livewire\WithFileUploads;
 new #[Title('Podgląd zgłoszenia')] class extends Component {
     use WithFileUploads;
 
+    use WithFileUploads;
+
     public Ticket $ticket;
 
+    public ?string $previewUrl = null;
+    public ?string $previewType = null;
+    public ?string $previewName = null;
+
     /** @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile> */
+    #[Validate(['attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,pdf|max:20480'])]
     public array $attachments = [];
+
+    protected function messages(): array
+    {
+        return [
+            'attachments.*.max' => __('Załącznik :attribute nie może być większy niż 20MB'),
+        ];
+    }
 
     #[Validate('required|string|max:2000')]
     public string $newMessageBody = '';
@@ -116,6 +131,34 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
         ]);
 
         session()->flash('success', __('Thank you for your rating. The ticket is now closed.'));
+    }
+
+    public function openPreview($attachmentId): void
+    {
+        $attachment = \App\Models\TicketAttachment::findOrFail($attachmentId);
+        
+        \Illuminate\Support\Facades\Gate::authorize('view', $attachment->ticket);
+
+        $disk = Storage::disk('public');
+        
+        if ($disk->providesTemporaryUrls()) {
+            $this->previewUrl = $disk->temporaryUrl($attachment->path, now()->addMinutes(5));
+        } else {
+            $this->previewUrl = $disk->url($attachment->path);
+        }
+
+        $mime = $attachment->mime_type;
+        if (str_starts_with($mime, 'image/')) {
+            $this->previewType = 'image';
+        } elseif ($mime === 'application/pdf') {
+            $this->previewType = 'pdf';
+        } else {
+            $this->previewType = 'unsupported';
+        }
+
+        $this->previewName = $attachment->filename;
+
+        \Flux::modal('file-preview')->show();
     }
 }; ?>
 
@@ -236,15 +279,25 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
                                     </flux:text>
                                 </div>
                             </div>
-                            <flux:button
-                                size="sm"
-                                variant="ghost"
-                                icon="arrow-down-tray"
-                                href="{{ Storage::disk('public')->url($attachment->path) }}"
-                                target="_blank"
-                            >
-                                {{ __('Download') }}
-                            </flux:button>
+                            <div class="flex items-center gap-2">
+                                <flux:button
+                                    size="sm"
+                                    variant="ghost"
+                                    icon="eye"
+                                    wire:click="openPreview({{ $attachment->id }})"
+                                >
+                                    {{ __('Preview') }}
+                                </flux:button>
+                                <flux:button
+                                    size="sm"
+                                    variant="ghost"
+                                    icon="arrow-down-tray"
+                                    href="{{ Storage::disk('public')->url($attachment->path) }}"
+                                    target="_blank"
+                                >
+                                    {{ __('Download') }}
+                                </flux:button>
+                            </div>
                         </li>
                     @endforeach
                 </ul>
@@ -292,7 +345,8 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
                         </flux:field>
                         <flux:field>
                             <flux:label>{{ __('Opis / Załączniki (Opcjonalnie)') }}</flux:label>
-                            <input type="file" wire:model="attachments" multiple class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-zinc-300" />
+                            <input type="file" wire:model="attachments" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-zinc-300" />
+                            <flux:description class="mb-2">{{ __('Screenshots or photos. JPG, PNG, GIF, WebP, PDF — max 20 MB each.') }}</flux:description>
                             <flux:error name="attachments.*" />
                         </flux:field>
                         <div class="flex justify-end">
@@ -350,4 +404,31 @@ new #[Title('Podgląd zgłoszenia')] class extends Component {
             @endif
         </div>
     </div>
+
+    <!-- File Preview Modal -->
+    <flux:modal name="file-preview" class="min-w-[70vw] max-w-4xl">
+        <div class="space-y-4">
+            <flux:heading size="lg">{{ $previewName }}</flux:heading>
+            
+            <div class="mt-4 flex min-h-[50vh] justify-center overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                @if ($previewType === 'image')
+                    <img src="{{ $previewUrl }}" class="h-auto w-full max-h-[75vh] object-contain" alt="{{ $previewName }}">
+                @elseif ($previewType === 'pdf')
+                    <iframe src="{{ $previewUrl }}" class="h-[75vh] w-full border-0"></iframe>
+                @elseif ($previewType)
+                    <div class="flex flex-col items-center justify-center p-12 text-center">
+                        <flux:icon.document class="mx-auto mb-4 size-12 text-zinc-400" />
+                        <flux:text>{{ __('Preview not available for this file type.') }}</flux:text>
+                        <flux:button class="mt-4" href="{{ $previewUrl }}" target="_blank">{{ __('Download directly instead') }}</flux:button>
+                    </div>
+                @endif
+            </div>
+            
+            <div class="mt-4 flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">{{ __('Close') }}</flux:button>
+                </flux:modal.close>
+            </div>
+        </div>
+    </flux:modal>
 </div>
