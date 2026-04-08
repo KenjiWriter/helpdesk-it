@@ -216,5 +216,10 @@
 
     "ticket_priority.normal":   "Normalny",
     "ticket_priority.urgent":   "Pilny",
-    "ticket_priority.fire":     "Krytyczny 🔥"
+    "ticket_priority.fire":     "Krytyczny 🔥",
+
+    "Preview": "Podgląd",
+    "Close": "Zamknij",
+    "Preview not available for this file type.": "Podgląd niedostępny dla tego typu pliku.",
+    "Download directly instead": "Pobierz plik bezpośrednio"
 }
