@@ -221,5 +221,10 @@
     "Preview": "Podgląd",
     "Close": "Zamknij",
     "Preview not available for this file type.": "Podgląd niedostępny dla tego typu pliku.",
-    "Download directly instead": "Pobierz plik bezpośrednio"
+    "Download directly instead": "Pobierz plik bezpośrednio",
+    
+    "Close Ticket": "Zamknij zgłoszenie",
+    "Are you sure you want to close this ticket?": "Czy na pewno chcesz zamknąć to zgłoszenie?",
+    "The ticket is now closed.": "Zgłoszenie zostało zamknięte.",
+    "Status zmieniony na: :status przez użytkownika": "Status zmieniony na: :status przez użytkownika"
 }
